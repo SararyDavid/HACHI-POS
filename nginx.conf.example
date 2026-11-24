@@ -1,0 +1,42 @@
+# Nginx Reverse Proxy Configuration for Hachi Tech POS
+# Place in /etc/nginx/sites-available/hachi-pos and symlink to /etc/nginx/sites-enabled/
+
+server {
+    listen 80;
+    server_name _; # Replace with your domain or VM public IP
+
+    # Gzip Compression
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+    # Client upload limit
+    client_max_body_size 10M;
+
+    # Reverse proxy all requests to Node.js backend (port 5000)
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_http_version 1.1;
+
+        # WebSocket & SSE header support
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+
+        # Real IP Forwarding
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Timeouts for real-time SSE payment push
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+    }
+
+    # Static assets caching
+    location /assets/ {
+        proxy_pass http://127.0.0.1:5000/assets/;
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+}

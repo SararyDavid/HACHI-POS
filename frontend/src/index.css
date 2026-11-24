@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    @apply h-screen w-full overflow-hidden bg-sky-50 text-slate-800 font-sans;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Remove up/down stepper arrows from all number inputs */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Pulse animation for scanner wedge readiness */
+@keyframes wedge-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.08); }
+}
+
+.animate-wedge {
+  animation: wedge-pulse 2s infinite ease-in-out;
+}
+
+/* =======================================================
+   80mm Thermal Receipt Print Styling (@media print)
+   Standard 80mm thermal paper printable width is ~72mm (280-300px)
+   Hides all UI, navbars, and buttons, printing only the receipt
+   ======================================================= */
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 0mm !important;
+  }
+
+  html, body {
+    width: 80mm !important;
+    max-width: 80mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide entire standard application UI during thermal print */
+  .no-print,
+  nav,
+  header,
+  footer,
+  aside,
+  button,
+  .modal-backdrop,
+  #app-main-layout {
+    display: none !important;
+  }
+
+  /* Show only the designated 80mm thermal receipt container */
+  #thermal-receipt-print-zone {
+    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 76mm !important;
+    max-width: 76mm !important;
+    margin: 2mm auto !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Sharp mono text rendering on thermal heads */
+  #thermal-receipt-print-zone * {
+    color: #000000 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+}

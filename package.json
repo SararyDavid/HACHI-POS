@@ -1,0 +1,19 @@
+{
+  "name": "hachi-tech-pos",
+  "version": "1.0.0",
+  "description": "Full-Stack Tech Retail POS & Inventory System for Hachi Tech",
+  "scripts": {
+    "start": "node start.js",
+    "dev": "node start.js",
+    "build": "cd frontend && npm install && npm run build && cd ../backend && npm install",
+    "build:frontend": "cd frontend && npm run build",
+    "start:prod": "cd backend && node server.js",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "start:backend": "cd backend && npm start",
+    "backup": "cd backend && npm run backup",
+    "init-db": "cd backend && npm run init-db"
+  },
+  "author": "Antigravity",
+  "license": "ISC"
+}

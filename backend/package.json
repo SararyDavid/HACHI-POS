@@ -1,0 +1,22 @@
+{
+  "name": "hachi-tech-pos-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Hachi Tech POS & Inventory Management System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "init-db": "node scripts/init-db.js",
+    "backup": "node scripts/backup-db.js",
+    "listen-phone": "node scripts/adb-payment-listener.js",
+    "setup-adb": "powershell -ExecutionPolicy Bypass -File scripts/setup-adb.ps1",
+    "telegram": "node -e \"require('dotenv').config(); require('./telegram').startTelegramPoller()\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.12.0",
+    "ws": "^8.23.0"
+  }
+}
