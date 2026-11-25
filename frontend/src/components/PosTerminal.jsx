@@ -421,7 +421,7 @@ export default function PosTerminal({
     if (cart.length === 0 || isSubmitting) return;
     setCheckoutError('');
 
-    const effectiveMethod = forcedMethod || paymentMethod;
+    const effectiveMethod = (typeof forcedMethod === 'string' && forcedMethod) ? forcedMethod : paymentMethod;
 
     if (effectiveMethod === 'cash' && !isSufficientAmount) {
       playErrorBoop();
@@ -1288,7 +1288,7 @@ export default function PosTerminal({
           {/* Row 8: Checkout Button (h-14 py-0) */}
           <button
             type="button"
-            onClick={handleCheckout}
+            onClick={() => handleCheckout()}
             disabled={cart.length === 0 || isSubmitting || !isSufficientAmount}
             className="w-full h-14 py-0 bg-sky-500 hover:bg-sky-400 active:scale-[0.99] text-white text-lg font-black rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
