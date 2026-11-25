@@ -5,8 +5,8 @@
   "scripts": {
     "start": "node start.js",
     "dev": "node start.js",
-    "build": "cd frontend && npm install && npm run build && cd ../backend && npm install",
-    "build:frontend": "cd frontend && npm run build",
+    "build": "cd frontend && npm install --include=dev && npm run build && cd ../backend && npm install",
+    "build:frontend": "cd frontend && npm install --include=dev && npm run build",
     "start:prod": "cd backend && node server.js",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
