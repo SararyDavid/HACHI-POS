@@ -496,10 +496,7 @@ export default function PosTerminal({
           ? formatKHR(data.amount || grandTotalKhr) 
           : formatCurrency(data.amount || grandTotal);
 
-        setScanNotification({
-          type: 'success',
-          message: `⚡ Payment Verified via ABA Bank (${confirmedAmtStr})! Processing sale...`
-        });
+        triggerNotification(`⚡ Payment Verified via ABA Bank (${confirmedAmtStr})! Processing sale...`, 'success');
 
         setKhqrModalOpen(false);
 
