@@ -195,13 +195,13 @@ export default function SalesHistory({ salesData, onReprintReceipt, onRefresh })
             
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
               <tr>
-                <th className="py-3 px-4">Invoice #</th>
-                <th className="py-3 px-4">Timestamp</th>
-                <th className="py-3 px-4">Cashier</th>
-                <th className="py-3 px-4">Line Items Summary</th>
-                <th className="py-3 px-3 text-center">Payment</th>
-                <th className="py-3 px-4 text-right">Total (USD / KHR)</th>
-                <th className="py-3 px-4 text-right">Reprint</th>
+                <th className="py-3 px-3">Invoice #</th>
+                <th className="py-3 px-2.5">Timestamp</th>
+                <th className="py-3 px-2.5">Cashier</th>
+                <th className="py-3 px-3">Line Items Summary</th>
+                <th className="py-3 px-2 text-center">Payment</th>
+                <th className="py-3 px-3 text-right">Total (USD / KHR)</th>
+                <th className="py-3 px-3 text-right">Actions</th>
               </tr>
             </thead>
 
@@ -223,7 +223,7 @@ export default function SalesHistory({ salesData, onReprintReceipt, onRefresh })
                     <tr key={sale.id} className="hover:bg-slate-50/70 transition-colors">
                       
                       {/* Invoice No & Shift badge */}
-                      <td className="py-3.5 px-4 font-mono font-bold text-slate-900 whitespace-nowrap">
+                      <td className="py-3 px-3 font-mono font-bold text-slate-900 whitespace-nowrap">
                         <div className="flex flex-col">
                           <div className="flex items-center space-x-1.5">
                             <span>{sale.invoice_no}</span>
@@ -242,7 +242,7 @@ export default function SalesHistory({ salesData, onReprintReceipt, onRefresh })
                       </td>
 
                       {/* Timestamp */}
-                      <td className="py-3.5 px-4 text-slate-500 whitespace-nowrap">
+                      <td className="py-3 px-2.5 text-slate-500 whitespace-nowrap">
                         <div className="flex items-center space-x-1.5">
                           <Clock className="w-3.5 h-3.5 text-slate-400" />
                           <span>{formatDateTime(sale.created_at)}</span>
@@ -250,12 +250,12 @@ export default function SalesHistory({ salesData, onReprintReceipt, onRefresh })
                       </td>
 
                       {/* Cashier */}
-                      <td className="py-3.5 px-4 text-slate-700 font-semibold whitespace-nowrap">
+                      <td className="py-3 px-2.5 text-slate-700 font-semibold whitespace-nowrap">
                         {sale.cashier_name || 'Admin'}
                       </td>
 
                       {/* Line Items Preview with S/N & Warranty */}
-                      <td className="py-3.5 px-4 max-w-sm">
+                      <td className="py-3 px-3 max-w-xs">
                         <div className="flex flex-col space-y-1">
                           <div className="flex items-center space-x-2">
                             <span className="font-semibold text-slate-800">
@@ -289,7 +289,7 @@ export default function SalesHistory({ salesData, onReprintReceipt, onRefresh })
                       </td>
 
                       {/* Payment Method Badge */}
-                      <td className="py-3.5 px-3 text-center whitespace-nowrap">
+                      <td className="py-3 px-2 text-center whitespace-nowrap">
                         {sale.payment_method === 'cash' ? (
                           <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold uppercase">
                             <Banknote className="w-3 h-3 text-emerald-600" />
@@ -309,7 +309,7 @@ export default function SalesHistory({ salesData, onReprintReceipt, onRefresh })
                       </td>
 
                       {/* Total Amount (Dual USD & KHR) */}
-                      <td className="py-3.5 px-4 text-right font-mono whitespace-nowrap">
+                      <td className="py-3 px-3 text-right font-mono whitespace-nowrap">
                         <div className="font-extrabold text-sm text-slate-900">
                           {formatCurrency(sale.total_amount)}
                         </div>
@@ -319,7 +319,7 @@ export default function SalesHistory({ salesData, onReprintReceipt, onRefresh })
                       </td>
 
                       {/* Actions: Reprint & Refund */}
-                      <td className="py-3.5 px-4 text-right whitespace-nowrap space-x-1.5">
+                      <td className="py-3 px-3 text-right whitespace-nowrap space-x-1.5">
                         <button
                           onClick={() => onReprintReceipt(sale)}
                           className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-700 font-bold text-xs border border-slate-200 hover:border-sky-200 transition-colors cursor-pointer"
