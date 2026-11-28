@@ -621,63 +621,49 @@ export default function PosTerminal({
           ======================================================== */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         
-        {/* Top Action Bar: Search & Dedicated Scanner Input */}
+        {/* Top Action Bar: Unified Search & Barcode Omni-Bar */}
         <div className="bg-white p-2.5 rounded-3xl border border-sky-100 shadow-xs space-y-2 shrink-0 mb-2.5">
           
-          <div className="flex flex-col sm:flex-row gap-2">
-            {/* Live Search Input */}
-            <div className="relative flex-1">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
-              <input
-                name="search-catalog"
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleScannedBarcode(searchQuery);
-                  }
-                }}
-                placeholder="Search catalog, brand, or press [/] to focus..."
-                className="w-full bg-sky-50/50 border border-sky-200 focus:border-sky-400 rounded-2xl pl-8 pr-12 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white transition-all"
-              />
-              <span className="absolute right-8 top-2 hidden sm:inline-block px-1.5 py-0.2 rounded bg-slate-100 text-[10px] font-mono font-bold text-slate-400 border border-slate-200 pointer-events-none">
-                /
-              </span>
+          <div className="relative w-full">
+            <Search className="w-4 h-4 absolute left-3.5 top-2.5 text-slate-400" />
+            <input
+              ref={quickScanRef}
+              name="search-catalog"
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchQuery.trim()) {
+                  e.preventDefault();
+                  handleScannedBarcode(searchQuery.trim());
+                }
+              }}
+              placeholder="Search product name, brand, or scan barcode with USB scanner... [/]"
+              className="w-full bg-slate-50/70 border border-slate-200 focus:border-sky-400 focus:bg-white rounded-2xl pl-10 pr-28 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+            />
+            
+            <div className="absolute right-2 top-1.5 flex items-center space-x-1.5">
               {searchQuery && (
                 <button
+                  type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1.5 px-1.5 py-0.5 rounded text-[10px] font-semibold text-slate-400 hover:text-slate-700 hover:bg-sky-100 transition-colors"
+                  className="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
                   Clear
                 </button>
               )}
-            </div>
-
-            {/* Dedicated Barcode Scanner Input */}
-            <div className="relative w-full sm:w-64">
-              <Scan className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-sky-500" />
-              <input
-                ref={quickScanRef}
-                type="text"
-                value={quickScanInput}
-                onChange={(e) => setQuickScanInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleScannedBarcode(quickScanInput);
-                  }
-                }}
-                placeholder="Scan / Type Barcode..."
-                className="w-full bg-pink-50/40 border-2 border-pink-200 focus:border-sky-400 rounded-2xl pl-8 pr-20 py-1.5 text-xs font-mono text-slate-800 placeholder-pink-400/80 focus:outline-none focus:bg-white transition-all shadow-xs"
-              />
               <button
                 type="button"
-                onClick={() => handleScannedBarcode(quickScanInput)}
-                className="absolute right-1 top-1 px-2.5 py-0.5 bg-sky-400 hover:bg-sky-500 text-white text-[10px] font-bold rounded-xl transition-colors flex items-center space-x-1 cursor-pointer shadow-xs"
+                onClick={() => {
+                  if (searchQuery.trim()) {
+                    handleScannedBarcode(searchQuery.trim());
+                  }
+                }}
+                className="px-3 py-1 bg-sky-500 hover:bg-sky-600 active:scale-95 text-white text-xs font-bold rounded-xl transition-all flex items-center space-x-1 cursor-pointer shadow-xs"
+                title="Scan or press Enter to add item directly"
               >
-                <span>Scan & Add</span>
+                <Scan className="w-3.5 h-3.5" />
+                <span>Scan / Enter</span>
               </button>
             </div>
           </div>
