@@ -2,9 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Hachi Design System Tokens */
+  --brand-600: #0284C7;
+  --brand-500: #0EA5E9;
+  --brand-100: #E0F2FE;
+  --brand-50:  #F0F9FF;
+
+  --bg:        #F8FAFC;
+  --surface:   #FFFFFF;
+  --border:    #E2E8F0;
+
+  --text-900:  #0F172A;
+  --text-600:  #475569;
+  --text-400:  #94A3B8;
+
+  --danger-600:  #DC2626;
+  --danger-50:   #FEF2F2;
+
+  --warning-600: #D97706;
+  --warning-50:  #FFFBEB;
+
+  --success-600: #16A34A;
+  --success-50:  #F0FDF4;
+
+  --radius-card: 12px;
+  --radius-btn:  10px;
+  --radius-pill: 9999px;
+
+  --shadow-soft: 0 1px 2px rgba(15,23,42,.06), 0 4px 12px rgba(15,23,42,.04);
+  --shadow-soft-hover: 0 4px 12px rgba(15,23,42,.08), 0 1px 3px rgba(15,23,42,.06);
+}
+
 @layer base {
   html, body, #root {
-    @apply h-screen w-full overflow-hidden bg-sky-50 text-slate-800 font-sans;
+    @apply h-screen w-full overflow-hidden bg-canvas text-txt-900 font-sans;
     margin: 0;
     padding: 0;
   }
@@ -95,17 +127,5 @@ input[type="number"] {
     border: none !important;
     background: #ffffff !important;
     color: #000000 !important;
-  }
-
-  /* Sharp mono text rendering on thermal heads */
-  #thermal-receipt-print-zone * {
-    color: #000000 !important;
-    text-shadow: none !important;
-    box-shadow: none !important;
-    background-color: transparent !important;
-  }
-
-  .page-break-after {
-    page-break-after: always;
   }
 }
