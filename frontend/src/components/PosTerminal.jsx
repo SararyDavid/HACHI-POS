@@ -171,6 +171,7 @@ export default function PosTerminal({
   const [highlightedProductId, setHighlightedProductId] = useState(null);
   const [justAddedId, setJustAddedId] = useState(null);
   const [autoPrintEnabled, setAutoPrintEnabled] = useState(true);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
   // Dedicated Quick Scan Barcode Input
   const [quickScanInput, setQuickScanInput] = useState('');
@@ -203,13 +204,21 @@ export default function PosTerminal({
 
       // Retail Speed Shortcuts (Only when cashier is NOT typing in an input)
       if (!isInput) {
-        // [Space] or [F1]: Quick Checkout
+        // [Enter] inside Confirm Modal triggers immediate checkout
+        if (e.key === 'Enter' && confirmModalOpen && cart.length > 0 && !isSubmitting) {
+          e.preventDefault();
+          setConfirmModalOpen(false);
+          executeCheckout();
+          return;
+        }
+
+        // [Space] or [F1]: Prompt Checkout Confirmation
         if ((e.code === 'Space' || e.key === 'F1') && cart.length > 0 && !isSubmitting) {
           e.preventDefault();
           if (paymentMethod === 'khqr') {
             setKhqrModalOpen(true);
           } else {
-            handleCheckout();
+            setConfirmModalOpen(true);
           }
           return;
         }
@@ -241,6 +250,7 @@ export default function PosTerminal({
         // [Escape]: Close Modals or Clear Search
         if (e.key === 'Escape') {
           setKhqrModalOpen(false);
+          setConfirmModalOpen(false);
           setEditingSnId(null);
           setCheckoutError('');
           return;
@@ -479,7 +489,7 @@ export default function PosTerminal({
   });
 
   // Handle Complete Sale & ACID Checkout
-  const handleCheckout = async (forcedMethod = null) => {
+  const executeCheckout = async (forcedMethod = null) => {
     if (cart.length === 0 || isSubmitting) return;
     setCheckoutError('');
 
@@ -533,6 +543,23 @@ export default function PosTerminal({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Safe Checkout Prompt
+  const handleCheckout = (forcedMethod = null) => {
+    if (cart.length === 0 || isSubmitting) return;
+    const effectiveMethod = (typeof forcedMethod === 'string' && forcedMethod) ? forcedMethod : paymentMethod;
+    if (effectiveMethod === 'khqr') {
+      setKhqrModalOpen(true);
+      return;
+    }
+    // Check cash sufficiency before opening confirm modal
+    if (effectiveMethod === 'cash' && !isSufficientAmount) {
+      playErrorBoop();
+      setCheckoutError(`Cash received ($${totalPaidInUsd.toFixed(2)}) is less than Grand Total ($${grandTotal.toFixed(2)} / ${grandTotalKhr.toLocaleString()} ៛).`);
+      return;
+    }
+    setConfirmModalOpen(true);
   };
 
   // ==========================================================
@@ -1413,9 +1440,79 @@ export default function PosTerminal({
         exchangeRate={exchangeRate}
         onPaymentSuccess={() => {
           setPaymentMethod('khqr');
-          handleCheckout('khqr');
+          executeCheckout('khqr');
         }}
       />
+
+      {/* Sale Confirmation Safety Barrier Modal */}
+      {confirmModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in no-print">
+          <div className="bg-white rounded-3xl shadow-modal w-full max-w-sm overflow-hidden border border-slate-200 flex flex-col p-6 text-center space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center mx-auto shadow-2xs">
+              <CheckCircle2 className="w-8 h-8 stroke-[2.5]" />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-black text-slate-800">Confirm Complete Sale?</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Please verify transaction details before finalizing.
+              </p>
+            </div>
+
+            {/* Summary Ticket Box */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-left space-y-1.5 text-xs">
+              <div className="flex justify-between text-slate-600 font-medium">
+                <span>Items in Cart:</span>
+                <span className="font-bold text-slate-800 font-mono">
+                  {cart.reduce((s, i) => s + i.quantity, 0)} items
+                </span>
+              </div>
+              <div className="flex justify-between text-slate-600 font-medium">
+                <span>Payment Method:</span>
+                <span className="font-black text-slate-800 uppercase tracking-wide">
+                  {paymentMethod}
+                </span>
+              </div>
+              <div className="flex justify-between text-slate-600 font-medium pt-1 border-t border-slate-200">
+                <span className="font-bold text-slate-700">Total to Pay:</span>
+                <div className="text-right">
+                  <div className="font-black text-slate-900 font-mono text-sm">{formatCurrency(grandTotal)}</div>
+                  <div className="text-[10px] text-pink-600 font-bold font-mono">{formatKHR(grandTotalKhr)}</div>
+                </div>
+              </div>
+              {paymentMethod === 'cash' && changeDue > 0 && (
+                <div className="flex justify-between text-emerald-700 font-bold pt-1 border-t border-slate-200">
+                  <span>Change Due:</span>
+                  <span>{formatCurrency(changeDue)}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setConfirmModalOpen(false)}
+                className="py-2.5 px-3 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                Cancel (Esc)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setConfirmModalOpen(false);
+                  executeCheckout();
+                }}
+                disabled={isSubmitting}
+                className="py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-black text-xs shadow-md transition-all cursor-pointer flex items-center justify-center space-x-1"
+              >
+                <span>Confirm (Enter)</span>
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
