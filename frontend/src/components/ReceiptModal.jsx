@@ -421,7 +421,21 @@ export default function ReceiptModal({
           <div style={{ fontSize: '8px' }}>Scan with ABA Mobile / Bakong App</div>
         </div>
 
+        {/* Barcode in Print Layout */}
         <div style={{ textAlign: 'center', paddingTop: '8px', fontSize: '9px' }}>
+          {/* Visual simulated Code-128 Barcode */}
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '4px 0' }}>
+            <div style={{ height: '32px', width: '160px', backgroundColor: '#000', display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '0 8px' }}>
+              <div style={{ height: '100%', width: '2px', backgroundColor: '#fff' }}></div>
+              <div style={{ height: '100%', width: '1px', backgroundColor: '#fff' }}></div>
+              <div style={{ height: '100%', width: '3px', backgroundColor: '#fff' }}></div>
+              <div style={{ height: '100%', width: '1px', backgroundColor: '#fff' }}></div>
+              <div style={{ height: '100%', width: '2px', backgroundColor: '#fff' }}></div>
+              <div style={{ height: '100%', width: '4px', backgroundColor: '#fff' }}></div>
+              <div style={{ height: '100%', width: '1px', backgroundColor: '#fff' }}></div>
+              <div style={{ height: '100%', width: '2px', backgroundColor: '#fff' }}></div>
+            </div>
+          </div>
           <div style={{ fontWeight: 'bold', letterSpacing: '2px', margin: '4px 0' }}>
             * {sale.invoice_no} *
           </div>

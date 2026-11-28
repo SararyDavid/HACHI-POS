@@ -83,16 +83,14 @@ input[type="number"] {
     display: none !important;
   }
 
-  /* Show only the designated 80mm thermal receipt container */
+  /* Show designated 80mm thermal receipt container centered cleanly */
   #thermal-receipt-print-zone {
     display: block !important;
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
+    position: relative !important;
     width: 76mm !important;
     max-width: 76mm !important;
-    margin: 2mm auto !important;
-    padding: 0 !important;
+    margin: 0 auto !important;
+    padding: 2mm 3mm !important;
     box-shadow: none !important;
     border: none !important;
     background: #ffffff !important;
@@ -104,6 +102,7 @@ input[type="number"] {
     color: #000000 !important;
     text-shadow: none !important;
     box-shadow: none !important;
+    background-color: transparent !important;
   }
 
   .page-break-after {
