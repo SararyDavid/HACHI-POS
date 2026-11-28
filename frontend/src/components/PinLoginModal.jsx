@@ -205,27 +205,6 @@ export default function PinLoginModal({ isOpen, onClose, currentCashier, onLogin
             </button>
           </div>
 
-          {/* Fast 1-Tap Demo Switcher */}
-          <div className="pt-2 border-t border-sky-100 flex justify-between items-center text-[11px]">
-            <span className="text-slate-400 font-medium">Quick Demo Sign-In:</span>
-            <div className="flex space-x-1.5">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin(CASHIERS[0])}
-                className="px-2 py-0.5 rounded-lg bg-sky-100 text-sky-700 font-bold hover:bg-sky-200 transition-colors cursor-pointer"
-              >
-                Alex S. (Cashier)
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin(CASHIERS[1])}
-                className="px-2 py-0.5 rounded-lg bg-indigo-100 text-indigo-700 font-bold hover:bg-indigo-200 transition-colors cursor-pointer"
-              >
-                David S. (Mgr)
-              </button>
-            </div>
-          </div>
-
         </div>
 
       </div>

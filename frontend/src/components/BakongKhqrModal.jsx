@@ -2,19 +2,14 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { 
   X, 
-  QrCode, 
   CheckCircle2, 
   RefreshCw, 
-  Sparkles, 
-  ExternalLink,
-  ShieldCheck,
-  Zap,
-  Copy,
+  Copy, 
   Check
 } from 'lucide-react';
-import { MY_ABA_STATIC_QR, MERCHANT_INFO, generateDynamicKhqr } from '../utils/khqr';
+import { MERCHANT_INFO, generateDynamicKhqr } from '../utils/khqr';
 import { formatCurrency, formatKHR } from '../utils/formatters';
-import { simulateKhqrPayment, createKhqrPaymentSession, checkKhqrStatus } from '../api';
+import { createKhqrPaymentSession, checkKhqrStatus } from '../api';
 
 export default function BakongKhqrModal({
   isOpen,
@@ -25,9 +20,7 @@ export default function BakongKhqrModal({
   onPaymentSuccess
 }) {
   const [currency, setCurrency] = useState('USD'); // 'USD' | 'KHR'
-  const [qrType, setQrType] = useState('dynamic'); // 'dynamic' | 'static'
   const [copied, setCopied] = useState(false);
-  const [isSimulating, setIsSimulating] = useState(false);
   const [countdown, setCountdown] = useState(300); // 5 min timer
   const [sessionStartTime, setSessionStartTime] = useState(Date.now());
   const [sessionBillNo, setSessionBillNo] = useState(() => 'INV-' + Date.now().toString().slice(-6));
@@ -61,7 +54,7 @@ export default function BakongKhqrModal({
           amount: activeAmount,
           currency,
           billNo: sessionBillNo,
-          mode: qrType
+          mode: 'dynamic'
         });
         if (res?.data) {
           if (res.data.khqr) setServerKhqr(res.data.khqr);
@@ -98,11 +91,10 @@ export default function BakongKhqrModal({
       active = false;
       if (pollTimer) clearInterval(pollTimer);
     };
-  }, [isOpen, activeAmount, currency, qrType, sessionBillNo]);
+  }, [isOpen, activeAmount, currency, sessionBillNo]);
 
   // Use the exact QR string returned by the server so the MD5 is 100% synchronized!
   const qrString = useMemo(() => {
-    if (qrType === 'static') return MY_ABA_STATIC_QR;
     if (serverKhqr) return serverKhqr;
     return generateDynamicKhqr({ 
       amount: activeAmount, 
@@ -111,7 +103,7 @@ export default function BakongKhqrModal({
       validityMinutes: 15,
       timestamp: sessionStartTime
     });
-  }, [qrType, serverKhqr, activeAmount, currency, sessionBillNo, sessionStartTime]);
+  }, [serverKhqr, activeAmount, currency, sessionBillNo, sessionStartTime]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -128,21 +120,6 @@ export default function BakongKhqrModal({
     navigator.clipboard.writeText(qrString);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleSimulate = async () => {
-    setIsSimulating(true);
-    try {
-      await simulateKhqrPayment({
-        amount: activeAmount,
-        currency
-      });
-      // onPaymentSuccess is also triggered via real-time WebSocket/SSE
-    } catch (err) {
-      console.error('Simulation error:', err);
-    } finally {
-      setIsSimulating(false);
-    }
   };
 
   if (!isOpen) return null;
@@ -189,8 +166,8 @@ export default function BakongKhqrModal({
               <span className="text-[10px] font-bold text-pink-600 uppercase tracking-wider block text-left">
                 Amount to Pay
               </span>
-              <div className="flex items-baseline space-x-1.5">
-                <span className="text-2xl font-black font-mono text-slate-900 leading-tight">
+              <div className="flex items-center space-x-2">
+                <span className="text-2xl font-black text-slate-900 leading-none">
                   {currency === 'USD' ? formatCurrency(totalUsd) : formatKHR(totalKhr)}
                 </span>
                 <span className="text-xs font-bold text-pink-500 font-mono">
@@ -255,33 +232,6 @@ export default function BakongKhqrModal({
             </span>
           </div>
 
-          {/* QR Type Switcher (Dynamic vs Static) */}
-          <div className="flex items-center justify-between w-full text-xs text-slate-500 px-1">
-            <span className="font-semibold text-[11px]">Payload Mode:</span>
-            <div className="flex items-center space-x-1 bg-slate-100 p-0.5 rounded-lg text-[11px]">
-              <button
-                type="button"
-                onClick={() => setQrType('dynamic')}
-                className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition-colors ${
-                  qrType === 'dynamic' ? 'bg-white text-slate-800 shadow-2xs' : 'text-slate-500'
-                }`}
-                title="Generates QR with pre-filled total bill amount"
-              >
-                Dynamic (Auto Amount)
-              </button>
-              <button
-                type="button"
-                onClick={() => setQrType('static')}
-                className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition-colors ${
-                  qrType === 'static' ? 'bg-white text-slate-800 shadow-2xs' : 'text-slate-500'
-                }`}
-                title="Uses David Sarary official static QR string"
-              >
-                Static (User String)
-              </button>
-            </div>
-          </div>
-
           {/* Scannable Apps List */}
           <p className="text-[10px] text-slate-400 leading-tight">
             Scan with <strong className="text-slate-600">ABA Mobile</strong>, <strong className="text-slate-600">Bakong</strong>, or any Cambodian Mobile Banking App.
@@ -291,9 +241,6 @@ export default function BakongKhqrModal({
           <button
             type="button"
             onClick={async () => {
-              try {
-                await simulateKhqrPayment({ amount: activeAmount, currency });
-              } catch (e) {}
               if (onPaymentSuccess) onPaymentSuccess();
               onClose();
             }}
@@ -315,7 +262,7 @@ export default function BakongKhqrModal({
                   if (onPaymentSuccess) onPaymentSuccess(checkRes.data);
                   onClose();
                 } else {
-                  alert(checkRes?.bakong?.responseMessage || 'Bakong: Transaction not found yet on NBC switch. If paying ABA-to-ABA, use Telegram or tap Confirm Payment.');
+                  alert(checkRes?.bakong?.responseMessage || 'Bakong: Transaction not found yet on NBC switch. If customer confirmed transfer, tap Confirm Payment.');
                 }
               } catch (err) {
                 alert('Bakong check failed: ' + err.message);
@@ -330,27 +277,16 @@ export default function BakongKhqrModal({
             <span>{isCheckingBakong ? 'Querying NBC Bakong...' : 'Re-Check Bakong API Status'}</span>
           </button>
 
-          {/* Secondary Action Buttons: Test Simulator & Copy String */}
-          <div className="grid grid-cols-2 gap-2 w-full pt-1 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={handleSimulate}
-              disabled={isSimulating}
-              className="py-1.5 px-2 bg-sky-100 hover:bg-sky-200 active:scale-95 text-sky-800 font-bold text-[11px] rounded-lg flex items-center justify-center space-x-1 transition-all cursor-pointer shadow-2xs"
-              title="Simulates real-time payment webhook arrival"
-            >
-              <Zap className="w-3 h-3 text-sky-600" />
-              <span>{isSimulating ? 'Simulating...' : 'Test Auto-Push'}</span>
-            </button>
-
+          {/* Action Footer: Copy QR String */}
+          <div className="w-full pt-1 border-t border-slate-100 flex justify-end">
             <button
               type="button"
               onClick={handleCopyRaw}
-              className="py-1.5 px-2 bg-white hover:bg-slate-50 active:scale-95 text-slate-700 font-bold text-[11px] rounded-lg border border-slate-200 flex items-center justify-center space-x-1 transition-all cursor-pointer shadow-2xs"
+              className="py-1 px-2.5 bg-white hover:bg-slate-50 active:scale-95 text-slate-500 hover:text-slate-700 font-bold text-[11px] rounded-lg border border-slate-200 flex items-center justify-center space-x-1 transition-all cursor-pointer shadow-2xs"
               title="Copy raw EMVCo payload string to clipboard"
             >
               {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3 text-slate-400" />}
-              <span>{copied ? 'Copied QR!' : 'Copy String'}</span>
+              <span>{copied ? 'Copied QR Payload!' : 'Copy Payload'}</span>
             </button>
           </div>
 

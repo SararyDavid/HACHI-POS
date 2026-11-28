@@ -158,7 +158,7 @@ export default function App() {
           </div>
         ) : (
           <>
-            {activeTab === 'pos' && (
+            <div className={`flex-1 flex overflow-hidden ${activeTab === 'pos' ? '' : 'hidden'}`}>
               <PosTerminal
                 products={products}
                 onRefreshProducts={handleRefreshProducts}
@@ -166,7 +166,7 @@ export default function App() {
                 currentShift={currentShift}
                 cashierName={cashier.name}
               />
-            )}
+            </div>
 
             {activeTab === 'inventory' && (
               <div className="flex-1 overflow-y-auto min-h-0">

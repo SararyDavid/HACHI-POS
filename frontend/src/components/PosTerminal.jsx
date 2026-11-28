@@ -118,8 +118,24 @@ export default function PosTerminal({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   
-  // Cart State
-  const [cart, setCart] = useState([]);
+  // Cart State (Persisted across refreshes and tab switches)
+  const [cart, setCart] = useState(() => {
+    try {
+      const saved = localStorage.getItem('hachi_pos_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Sync cart changes to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('hachi_pos_cart', JSON.stringify(cart));
+    } catch (e) {
+      console.warn('Failed to save cart to localStorage', e);
+    }
+  }, [cart]);
   const [discountType, setDiscountType] = useState('amount'); // 'amount' or 'percent'
   const [discountValue, setDiscountValue] = useState('');
   const [taxPercent, setTaxPercent] = useState(0); // 0% or 10%
@@ -525,7 +541,6 @@ export default function PosTerminal({
   // ==========================================================
   useEffect(() => {
     const unsubscribe = subscribeToPaymentEvents((data) => {
-      console.log('[Real-Time Payment Event Received]', data);
       
       // Auto-trigger sale completion when payment arrives!
       if (cart.length > 0 && !isSubmitting) {
@@ -1311,25 +1326,16 @@ export default function PosTerminal({
                       <div className="flex items-center justify-between mt-1">
                         <button
                           type="button"
-                          onClick={async () => {
-                            try {
-                              await simulateKhqrPayment({ amount: activeKhqrAmount, currency: khqrCurrency });
-                            } catch (e) {}
-                          }}
-                          className="px-2 py-0.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black rounded flex items-center space-x-1 cursor-pointer transition-all shadow-2xs active:scale-95"
+                          onClick={() => handleCheckout('khqr')}
+                          className="px-2.5 py-0.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black rounded flex items-center space-x-1 cursor-pointer transition-all shadow-2xs active:scale-95"
                           title="Click to confirm customer payment received"
                         >
                           <CheckCircle2 className="w-2.5 h-2.5" />
                           <span>✓ Confirm Paid</span>
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => setKhqrQrMode(prev => prev === 'dynamic' ? 'static' : 'dynamic')}
-                          className="text-[10px] text-slate-500 hover:text-slate-800 underline cursor-pointer"
-                          title="Switch between Dynamic QR (amount encoded) and Static David Sarary QR"
-                        >
-                          {khqrQrMode === 'dynamic' ? 'Auto Amount' : 'Static String'}
-                        </button>
+                        <span className="text-[10px] font-medium text-slate-400">
+                          Official Dynamic KHQR
+                        </span>
                       </div>
                     </div>
                   </div>

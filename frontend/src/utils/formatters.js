@@ -13,7 +13,7 @@ export function formatCurrency(amount) {
 
 export function formatKHR(amount) {
   const num = Math.round(parseFloat(amount) || 0);
-  return num.toLocaleString() + ' ៛';
+  return num.toLocaleString() + '៛';
 }
 
 export function usdToKhr(usdAmount, exchangeRate = DEFAULT_EXCHANGE_RATE) {
