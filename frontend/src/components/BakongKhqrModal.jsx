@@ -135,7 +135,7 @@ export default function BakongKhqrModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl border-2 border-pink-100 overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col">
         
         {/* Header - Official Bakong Red Banner */}
         <div className="bg-[#E21A1A] text-white px-5 py-3 flex items-center justify-between">
@@ -167,28 +167,28 @@ export default function BakongKhqrModal({
           </div>
 
           {/* Amount Display */}
-          <div className="bg-pink-50/70 border border-pink-200/80 rounded-2xl px-4 py-2 w-full flex items-center justify-between">
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2 w-full flex items-center justify-between">
             <div>
-              <span className="text-[10px] font-bold text-pink-600 uppercase tracking-wider block text-left">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block text-left">
                 Amount to Pay
               </span>
               <div className="flex items-center space-x-2">
                 <span className="text-2xl font-black text-slate-900 leading-none">
                   {currency === 'USD' ? formatCurrency(totalUsd) : formatKHR(totalKhr)}
                 </span>
-                <span className="text-xs font-bold text-pink-500 font-mono">
+                <span className="text-xs font-bold text-slate-500 font-mono">
                   ({currency === 'USD' ? formatKHR(totalKhr) : formatCurrency(totalUsd)})
                 </span>
               </div>
             </div>
 
             {/* Currency Selector */}
-            <div className="flex bg-white rounded-xl p-0.5 border border-pink-200 shadow-2xs text-xs">
+            <div className="flex bg-white rounded-xl p-0.5 border border-slate-200 shadow-2xs text-xs">
               <button
                 type="button"
                 onClick={() => setCurrency('USD')}
                 className={`px-2.5 py-1 rounded-lg font-black transition-colors cursor-pointer ${
-                  currency === 'USD' ? 'bg-pink-500 text-white shadow-2xs' : 'text-slate-500'
+                  currency === 'USD' ? 'bg-sky-600 text-white shadow-2xs' : 'text-slate-600'
                 }`}
               >
                 USD ($)
@@ -197,7 +197,7 @@ export default function BakongKhqrModal({
                 type="button"
                 onClick={() => setCurrency('KHR')}
                 className={`px-2.5 py-1 rounded-lg font-black transition-colors cursor-pointer ${
-                  currency === 'KHR' ? 'bg-pink-500 text-white shadow-2xs' : 'text-slate-500'
+                  currency === 'KHR' ? 'bg-sky-600 text-white shadow-2xs' : 'text-slate-600'
                 }`}
               >
                 KHR (៛)

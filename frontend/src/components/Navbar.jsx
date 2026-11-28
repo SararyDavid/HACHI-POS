@@ -33,7 +33,7 @@ export default function Navbar({
             <span className="font-extrabold text-base tracking-tight text-slate-800">
               HACHI<span className="text-sky-500">TECH</span>
             </span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-pink-50 text-pink-500 font-bold border border-pink-200/70">
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-700 font-bold border border-slate-200">
               POS v2.4
             </span>
           </div>
@@ -59,7 +59,7 @@ export default function Navbar({
               <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-sky-500' : 'text-slate-400'}`} />
               <span>{item.label}</span>
               {item.badge > 0 && (
-                <span className="ml-1 px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-pink-400 text-white animate-pulse">
+                <span className="ml-1 px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-amber-500 text-white animate-pulse">
                   {item.badge}
                 </span>
               )}

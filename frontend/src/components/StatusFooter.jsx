@@ -76,11 +76,11 @@ export default function StatusFooter({
           className={`flex items-center space-x-1 px-2.5 py-0.5 rounded-full font-bold transition-all cursor-pointer ${
             currentShift 
               ? 'text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200' 
-              : 'text-pink-600 bg-pink-50 hover:bg-pink-100 border border-pink-200'
+              : 'text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200'
           }`}
           title="Shift Management"
         >
-          <Clock className="w-3 h-3 text-pink-400" />
+          <Clock className={`w-3 h-3 ${currentShift ? 'text-sky-500' : 'text-amber-500'}`} />
           <span>{currentShift ? `Shift #${currentShift.shift_no.slice(-4)}` : 'Open Shift'}</span>
         </button>
 

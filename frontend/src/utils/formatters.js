@@ -58,8 +58,8 @@ export function getStockStatus(stockQty, lowThreshold = 5) {
   if (qty <= 0) {
     return {
       status: 'Out of Stock',
-      badgeClass: 'bg-pink-100 text-pink-600 border-pink-200',
-      dotClass: 'bg-pink-500',
+      badgeClass: 'bg-rose-100 text-rose-700 border-rose-200',
+      dotClass: 'bg-rose-500',
       isLow: true,
       isOut: true
     };
@@ -67,8 +67,8 @@ export function getStockStatus(stockQty, lowThreshold = 5) {
   if (qty <= threshold) {
     return {
       status: `Low Stock (${qty})`,
-      badgeClass: 'bg-pink-50 text-pink-500 border-pink-200',
-      dotClass: 'bg-pink-400',
+      badgeClass: 'bg-amber-50 text-amber-700 border-amber-200',
+      dotClass: 'bg-amber-500',
       isLow: true,
       isOut: false
     };

@@ -47,52 +47,13 @@ import confetti from 'canvas-confetti';
 
 const CATEGORIES = ['All', 'Peripherals', 'Components', 'Tools', 'Storage', 'Cables', 'Services'];
 
-// Category Color-Blocking & Border Styles (Glanceable 2.5ft Visual Hierarchy)
+// Crisp Minimalist Enterprise Border & Hover (Clean 60-30-10 palette)
 const getCategoryStyle = (category) => {
-  switch (category?.toLowerCase()) {
-    case 'cables':
-      return {
-        border: 'border-l-8 border-l-sky-400',
-        badge: 'bg-sky-100 text-sky-800 border-sky-300',
-        bg: 'hover:bg-sky-50/40'
-      };
-    case 'components':
-      return {
-        border: 'border-l-8 border-l-pink-400',
-        badge: 'bg-pink-100 text-pink-800 border-pink-300',
-        bg: 'hover:bg-pink-50/40'
-      };
-    case 'peripherals':
-      return {
-        border: 'border-l-8 border-l-indigo-400',
-        badge: 'bg-indigo-100 text-indigo-800 border-indigo-300',
-        bg: 'hover:bg-indigo-50/40'
-      };
-    case 'storage':
-      return {
-        border: 'border-l-8 border-l-amber-400',
-        badge: 'bg-amber-100 text-amber-800 border-amber-300',
-        bg: 'hover:bg-amber-50/40'
-      };
-    case 'tools':
-      return {
-        border: 'border-l-8 border-l-emerald-400',
-        badge: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-        bg: 'hover:bg-emerald-50/40'
-      };
-    case 'services':
-      return {
-        border: 'border-l-8 border-l-purple-400',
-        badge: 'bg-purple-100 text-purple-800 border-purple-300',
-        bg: 'hover:bg-purple-50/40'
-      };
-    default:
-      return {
-        border: 'border-l-8 border-l-sky-400',
-        badge: 'bg-sky-100 text-sky-800 border-sky-300',
-        bg: 'hover:bg-sky-50/40'
-      };
-  }
+  return {
+    border: 'border border-slate-200/90 hover:border-blue-500 hover:shadow-md',
+    badge: 'bg-slate-100 text-slate-700 border-slate-200',
+    bg: 'hover:bg-slate-50/60'
+  };
 };
 
 // Category icon mapper for visual image placeholder
@@ -606,10 +567,10 @@ export default function PosTerminal({
       {scanNotification && (
         <div className={`fixed bottom-10 right-5 z-50 px-3.5 py-2 rounded-2xl shadow-lg border text-xs font-semibold flex items-center space-x-2 animate-bounce ${
           scanNotification.type === 'success' 
-            ? 'bg-sky-400 text-white border-sky-500 shadow-sky-400/30' 
+            ? 'bg-sky-500 text-white border-sky-600 shadow-sky-500/30' 
             : scanNotification.type === 'error'
-            ? 'bg-pink-500 text-white border-pink-600 shadow-pink-500/30' 
-            : 'bg-amber-400 text-white border-amber-500 shadow-amber-400/30'
+            ? 'bg-rose-500 text-white border-rose-600 shadow-rose-500/30' 
+            : 'bg-amber-500 text-white border-amber-600 shadow-amber-500/30'
         }`}>
           <Scan className="w-3.5 h-3.5" />
           <span>{scanNotification.message}</span>
@@ -689,9 +650,9 @@ export default function PosTerminal({
               })}
             </div>
 
-            {/* Dual Currency Exchange Rate Pill (Hachi Cheek Pink) */}
-            <div className="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-pink-50 border border-pink-200 text-pink-600 text-[11px] font-bold flex-shrink-0">
-              <Coins className="w-3.5 h-3.5 text-pink-400" />
+            {/* Dual Currency Exchange Rate Pill */}
+            <div className="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold flex-shrink-0">
+              <Coins className="w-3.5 h-3.5 text-slate-500" />
               {isEditingRate ? (
                 <div className="flex items-center space-x-1">
                   <span>$1 =</span>
@@ -706,7 +667,7 @@ export default function PosTerminal({
                       }
                     }}
                     onFocus={(e) => e.target.select()}
-                    className="w-16 bg-white border border-pink-300 rounded-lg px-1.5 py-0.5 text-[11px] font-mono font-bold text-slate-800 focus:outline-none focus:border-pink-500 shadow-2xs"
+                    className="w-16 bg-white border border-slate-300 rounded-lg px-1.5 py-0.5 text-[11px] font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs"
                   />
                   <span>KHR</span>
                   <button
@@ -728,7 +689,7 @@ export default function PosTerminal({
                   title="Click to edit USD/KHR exchange rate"
                 >
                   <span>$1 = {exchangeRate.toLocaleString()} ៛</span>
-                  <Edit2 className="w-3 h-3 text-pink-400 ml-0.5 opacity-70" />
+                  <Edit2 className="w-3 h-3 text-slate-400 ml-0.5 opacity-70" />
                 </button>
               )}
             </div>
@@ -830,7 +791,7 @@ export default function PosTerminal({
                       <span className="text-sky-600 text-lg font-black font-mono">
                         {formatCurrency(product.selling_price)}
                       </span>
-                      <span className="px-1.5 py-0.5 rounded-md bg-pink-50 border border-pink-200 text-pink-600 text-[10px] font-bold font-mono">
+                      <span className="px-1.5 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-bold font-mono">
                         {formatKHR(parseFloat(product.selling_price) * exchangeRate)}
                       </span>
                     </div>
@@ -1056,7 +1017,7 @@ export default function PosTerminal({
                 <span className="text-3xl font-black text-sky-600 font-mono tracking-tight leading-none">
                   {formatCurrency(grandTotal)}
                 </span>
-                <span className="text-xs font-bold text-pink-500 font-mono">
+                <span className="text-xs font-bold text-slate-500 font-mono">
                   ({formatKHR(grandTotalKhr)})
                 </span>
               </div>
@@ -1153,8 +1114,8 @@ export default function PosTerminal({
                     }}
                     className={`h-8 rounded-xl border font-mono text-[11px] font-black transition-all cursor-pointer active:scale-95 shadow-2xs flex items-center justify-center ${
                       parseFloat(amountReceivedKhr) === bill.val && !amountReceived
-                        ? 'bg-pink-500 text-white border-pink-600 ring-1 ring-pink-300'
-                        : 'bg-white hover:bg-pink-100 text-pink-800 border-pink-200'
+                        ? 'bg-slate-800 text-white border-slate-900 ring-1 ring-slate-400'
+                        : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
                     }`}
                   >
                     {bill.label}
@@ -1166,7 +1127,7 @@ export default function PosTerminal({
                     setAmountReceived('');
                     setAmountReceivedKhr(Math.round(grandTotalKhr).toString());
                   }}
-                  className="h-8 rounded-xl border bg-pink-500 hover:bg-pink-600 text-white font-mono text-[11px] font-black transition-all cursor-pointer active:scale-95 shadow-2xs flex items-center justify-center"
+                  className="h-8 rounded-xl border bg-slate-800 hover:bg-slate-900 text-white font-mono text-[11px] font-black transition-all cursor-pointer active:scale-95 shadow-2xs flex items-center justify-center"
                   title="Exact KHR"
                 >
                   Exact ៛
@@ -1206,8 +1167,8 @@ export default function PosTerminal({
                 </div>
 
                 {/* KHR Manual */}
-                <div className="h-10 bg-white border border-pink-200 rounded-xl px-2.5 flex items-center focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-200 shadow-2xs">
-                  <span className="text-pink-500 font-mono text-sm font-bold mr-1.5">៛</span>
+                <div className="h-10 bg-white border border-slate-200 rounded-xl px-2.5 flex items-center focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-200 shadow-2xs">
+                  <span className="text-slate-500 font-mono text-sm font-bold mr-1.5">៛</span>
                   <input
                     id="khr-cash-input"
                     type="text"
@@ -1221,13 +1182,13 @@ export default function PosTerminal({
                     }}
                     onFocus={(e) => e.target.select()}
                     placeholder="Paid (៛ KHR)"
-                    className="w-full bg-transparent font-mono text-sm font-black text-pink-600 focus:outline-none placeholder:text-pink-300 placeholder:font-sans placeholder:text-xs"
+                    className="w-full bg-transparent font-mono text-sm font-black text-slate-800 focus:outline-none placeholder:text-slate-400 placeholder:font-sans placeholder:text-xs"
                   />
                   {amountReceivedKhr !== '' && (
                     <button
                       type="button"
                       onClick={() => setAmountReceivedKhr('')}
-                      className="text-pink-400 hover:text-pink-700 text-xs font-bold px-1 cursor-pointer"
+                      className="text-slate-400 hover:text-slate-700 text-xs font-bold px-1 cursor-pointer"
                       title="Clear KHR"
                     >
                       ×
@@ -1243,7 +1204,7 @@ export default function PosTerminal({
                   <span className="font-mono font-black text-base text-sky-600 leading-none">
                     {formatCurrency(changeDueUsd)}
                   </span>
-                  <span className="font-mono font-bold text-[11px] text-pink-500">
+                  <span className="font-mono font-bold text-[11px] text-slate-500">
                     ({formatKHR(changeDueKhr)})
                   </span>
                 </div>
@@ -1274,7 +1235,7 @@ export default function PosTerminal({
                   });
 
               return (
-                <div className="p-2 rounded-xl bg-white border border-pink-200 shadow-2xs space-y-1.5">
+                <div className="p-2 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-1.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-1.5">
                       <span className="bg-[#E21A1A] text-white font-black text-[9px] px-1 py-0.2 rounded tracking-wider">KHQR</span>
@@ -1285,18 +1246,18 @@ export default function PosTerminal({
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span>Live Radar</span>
                       </div>
-                      <div className="flex items-center space-x-0.5 bg-pink-50 p-0.5 rounded text-[11px]">
+                      <div className="flex items-center space-x-0.5 bg-slate-100 p-0.5 rounded text-[11px]">
                         <button
                           type="button"
                           onClick={() => setKhqrCurrency('USD')}
-                          className={`px-1.5 py-0.5 rounded font-black cursor-pointer ${khqrCurrency === 'USD' ? 'bg-pink-500 text-white' : 'text-slate-500'}`}
+                          className={`px-1.5 py-0.5 rounded font-black cursor-pointer ${khqrCurrency === 'USD' ? 'bg-sky-600 text-white' : 'text-slate-600'}`}
                         >
                           USD
                         </button>
                         <button
                           type="button"
                           onClick={() => setKhqrCurrency('KHR')}
-                          className={`px-1.5 py-0.5 rounded font-black cursor-pointer ${khqrCurrency === 'KHR' ? 'bg-pink-500 text-white' : 'text-slate-500'}`}
+                          className={`px-1.5 py-0.5 rounded font-black cursor-pointer ${khqrCurrency === 'KHR' ? 'bg-sky-600 text-white' : 'text-slate-600'}`}
                         >
                           KHR
                         </button>
@@ -1305,11 +1266,11 @@ export default function PosTerminal({
                   </div>
 
                   {/* Scannable Real QR Image and Details */}
-                  <div className="flex items-center space-x-2.5 bg-pink-50/50 p-1.5 rounded-lg border border-pink-100">
+                  <div className="flex items-center space-x-2.5 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
                     <button
                       type="button"
                       onClick={() => setKhqrModalOpen(true)}
-                      className="w-14 h-14 bg-white border-2 border-slate-900 rounded-lg p-0.5 shrink-0 flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-pink-400 transition-all shadow-xs relative group"
+                      className="w-14 h-14 bg-white border-2 border-slate-900 rounded-lg p-0.5 shrink-0 flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-sky-500 transition-all shadow-xs relative group"
                       title="Click to enlarge for customer scanning"
                     >
                       <QRCodeSVG
@@ -1463,7 +1424,7 @@ export default function PosTerminal({
                 <span className="font-bold text-slate-700">Total to Pay:</span>
                 <div className="text-right">
                   <div className="font-black text-slate-900 font-mono text-sm">{formatCurrency(grandTotal)}</div>
-                  <div className="text-[10px] text-pink-600 font-bold font-mono">{formatKHR(grandTotalKhr)}</div>
+                  <div className="text-[10px] text-slate-500 font-bold font-mono">{formatKHR(grandTotalKhr)}</div>
                 </div>
               </div>
               {paymentMethod === 'cash' && changeDueUsd > 0 && (
