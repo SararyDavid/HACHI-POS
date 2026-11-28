@@ -172,8 +172,8 @@ export default function PosTerminal({
   }, []);
 
   // ==========================================================
-  // Always-Ready Hands-Free USB Barcode Scanner Listener
-  // Automatically captures scans when idle without hijacking text inputs
+  // Always-Ready Hands-Free USB Barcode Scanner & Retail Hotkeys
+  // Automatically captures scans when idle & provides power-user shortcuts
   // ==========================================================
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
@@ -184,6 +184,52 @@ export default function PosTerminal({
         activeEl.tagName === 'SELECT'
       );
       const isQuickScanActive = activeEl === quickScanRef.current;
+
+      // Retail Speed Shortcuts (Only when cashier is NOT typing in an input)
+      if (!isInput) {
+        // [Space] or [F1]: Quick Checkout
+        if ((e.code === 'Space' || e.key === 'F1') && cart.length > 0 && !isSubmitting) {
+          e.preventDefault();
+          if (paymentMethod === 'khqr') {
+            setKhqrModalOpen(true);
+          } else {
+            handleCheckout();
+          }
+          return;
+        }
+
+        // [F2]: Open Bakong KHQR Modal
+        if (e.key === 'F2' && cart.length > 0) {
+          e.preventDefault();
+          setPaymentMethod('khqr');
+          setKhqrModalOpen(true);
+          return;
+        }
+
+        // [F4]: Reset / Clear Cart
+        if (e.key === 'F4' && cart.length > 0) {
+          e.preventDefault();
+          clearCart();
+          return;
+        }
+
+        // [/]: Quick-Focus Search Bar
+        if (e.key === '/') {
+          e.preventDefault();
+          const searchInput = document.querySelector('input[name="search-catalog"]');
+          searchInput?.focus();
+          searchInput?.select();
+          return;
+        }
+
+        // [Escape]: Close Modals or Clear Search
+        if (e.key === 'Escape') {
+          setKhqrModalOpen(false);
+          setEditingSnId(null);
+          setCheckoutError('');
+          return;
+        }
+      }
 
       // CRITICAL: If cashier is typing inside ANY input (Discount, Paid USD/KHR, Search, S/N, Modal, etc.)
       // NEVER steal focus to the barcode scanner!
@@ -201,7 +247,7 @@ export default function PosTerminal({
 
       // If user is completely outside any input (e.g. clicked product card, background, or button)
       // and presses a printable alphanumeric character, auto-focus scanner input for USB wedge scanner
-      if (!isInput && e.key && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      if (!isInput && e.key && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && e.code !== 'Space') {
         quickScanRef.current?.focus();
       }
 
@@ -229,14 +275,14 @@ export default function PosTerminal({
       }
 
       // Collect alphanumeric characters into the global scanner buffer
-      if (e.key && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      if (e.key && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && e.code !== 'Space') {
         barcodeBufferRef.current += e.key;
       }
     };
 
     window.addEventListener('keydown', handleGlobalKeyDown, true);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown, true);
-  }, [products, quickScanInput, searchQuery, editingSnId]);
+  }, [products, quickScanInput, searchQuery, editingSnId, cart, isSubmitting, paymentMethod]);
 
   // Handle scanned or entered barcode with duplicate debounce
   const handleScannedBarcode = (code) => {
@@ -551,9 +597,12 @@ export default function PosTerminal({
                     handleScannedBarcode(searchQuery);
                   }
                 }}
-                placeholder="Search by name, brand, or scan barcode..."
+                placeholder="Search catalog, brand, or press [/] to focus..."
                 className="w-full bg-sky-50/50 border border-sky-200 focus:border-sky-400 rounded-2xl pl-8 pr-12 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white transition-all"
               />
+              <span className="absolute right-8 top-2 hidden sm:inline-block px-1.5 py-0.2 rounded bg-slate-100 text-[10px] font-mono font-bold text-slate-400 border border-slate-200 pointer-events-none">
+                /
+              </span>
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
@@ -675,12 +724,13 @@ export default function PosTerminal({
                 const inCartQty = inCartItem ? inCartItem.quantity : 0;
                 const isJustAdded = justAddedId === product.id;
                 const catStyle = getCategoryStyle(product.category);
+                const isLowStock = product.stock_qty <= (product.low_stock_threshold || 3) && product.stock_qty > 0;
 
                 return (
                   <div
                     key={product.id}
                     onClick={() => !isOutOfStock && addToCart(product)}
-                    className={`group relative bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all duration-150 flex flex-col p-4 cursor-pointer hover:bg-sky-50 active:scale-95 select-none min-h-[120px] justify-between ${catStyle.border} ${catStyle.bg} ${
+                    className={`group relative bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all duration-150 flex flex-col p-3.5 cursor-pointer hover:bg-sky-50/60 active:scale-95 select-none min-h-[145px] justify-between ${catStyle.border} ${catStyle.bg} ${
                       isJustAdded
                         ? 'ring-4 ring-sky-400 bg-sky-50 scale-[1.02] shadow-lg'
                         : highlightedProductId === product.id
@@ -709,25 +759,51 @@ export default function PosTerminal({
                       </div>
                     )}
 
-                    {/* Top: Product Name (with in-cart count badge if added) */}
-                    <div className="flex items-start justify-between gap-2">
-                      <h4 className="text-lg font-bold text-slate-800 line-clamp-2 mt-2 leading-snug group-hover:text-sky-600 transition-colors">
-                        {product.name}
-                      </h4>
+                    {/* Top Meta: Brand Pill & In-Cart Count */}
+                    <div className="flex items-center justify-between gap-1 mb-1.5">
+                      <div className="flex items-center space-x-1.5 overflow-hidden">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-bold text-[10px] uppercase tracking-wider shrink-0 border border-slate-200/60">
+                          {product.brand || product.category}
+                        </span>
+                        {isLowStock && (
+                          <span className="px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 font-bold text-[9px] flex items-center space-x-0.5 shrink-0 border border-amber-200">
+                            <span>⚠️ {product.stock_qty} left</span>
+                          </span>
+                        )}
+                      </div>
                       {inCartQty > 0 && (
-                        <span className="shrink-0 px-2 py-0.5 rounded-full bg-sky-500 text-white font-black text-xs font-mono shadow-xs mt-2">
+                        <span className="shrink-0 px-2 py-0.5 rounded-full bg-sky-500 text-white font-black text-xs font-mono shadow-xs">
                           ×{inCartQty}
                         </span>
                       )}
                     </div>
 
-                    {/* Bottom: Price */}
-                    <div className="mt-auto pt-3 flex items-baseline justify-between border-t border-slate-100/90">
-                      <span className="text-sky-600 text-xl font-black font-mono">
+                    {/* Center: Thumbnail + Title */}
+                    <div className="flex items-start space-x-2.5 my-1">
+                      <div className="w-11 h-11 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 shrink-0 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                        {product.image ? (
+                          <img 
+                            src={product.image} 
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                        ) : (
+                          <Package className="w-5 h-5 text-slate-400" />
+                        )}
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-sky-600 transition-colors">
+                        {product.name}
+                      </h4>
+                    </div>
+
+                    {/* Bottom: Price + KHR Dual-Currency Pill */}
+                    <div className="mt-auto pt-2 flex items-baseline justify-between border-t border-slate-100">
+                      <span className="text-sky-600 text-lg font-black font-mono">
                         {formatCurrency(product.selling_price)}
                       </span>
-                      <span className="text-xs font-bold text-pink-500 font-mono">
-                        ({formatKHR(parseFloat(product.selling_price) * exchangeRate)})
+                      <span className="px-1.5 py-0.5 rounded-md bg-pink-50 border border-pink-200 text-pink-600 text-[10px] font-bold font-mono">
+                        {formatKHR(parseFloat(product.selling_price) * exchangeRate)}
                       </span>
                     </div>
 
@@ -963,7 +1039,7 @@ export default function PosTerminal({
           <div className="grid grid-cols-3 gap-1.5">
             {[
               { id: 'cash', label: 'Cash (USD/៛)', icon: Banknote },
-              { id: 'khqr', label: 'KHQR (Bakong)', icon: QrCode },
+              { id: 'khqr', label: 'KHQR (Bakong)', icon: QrCode, hotkey: 'F2' },
               { id: 'card', label: 'Card', icon: CreditCard }
             ].map(method => {
               const Icon = method.icon;
@@ -979,7 +1055,7 @@ export default function PosTerminal({
                       setAmountReceivedKhr('');
                     }
                   }}
-                  className={`h-9 px-2 rounded-xl border flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+                  className={`h-9 px-2 rounded-xl border flex items-center justify-center space-x-1.5 transition-all cursor-pointer relative ${
                     isSelected
                       ? 'bg-sky-100 border-sky-400 text-sky-800 font-black shadow-2xs'
                       : 'bg-white border-slate-200 text-slate-600 hover:bg-sky-50 font-bold'
@@ -987,6 +1063,11 @@ export default function PosTerminal({
                 >
                   <Icon className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-sky-600' : 'text-slate-400'}`} />
                   <span className="text-xs font-black truncate">{method.label}</span>
+                  {method.hotkey && (
+                    <span className="hidden sm:inline-block px-1 py-0.2 rounded bg-slate-100 text-[9px] font-mono font-bold text-slate-400 border border-slate-200">
+                      {method.hotkey}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -1277,24 +1358,40 @@ export default function PosTerminal({
             </div>
           )}
 
-          {/* Checkout Error */}
-          {checkoutError && (
-            <div className="p-1.5 rounded-lg bg-rose-100 border border-rose-300 text-rose-700 text-xs font-bold flex items-center space-x-1.5">
-              <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-500" />
-              <span>{checkoutError}</span>
-            </div>
-          )}
+          {/* Row 7.5: Zero-Shift Status & Error Strip (Fixed min-height to prevent jumping) */}
+          <div className="min-h-[26px] flex items-center justify-between text-xs px-1">
+            {checkoutError ? (
+              <div className="w-full p-1.5 rounded-lg bg-rose-100 border border-rose-300 text-rose-700 font-bold flex items-center space-x-1.5 animate-pulse">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+                <span className="truncate">{checkoutError}</span>
+              </div>
+            ) : paymentMethod === 'cash' && cart.length > 0 && isSufficientAmount ? (
+              <div className="text-emerald-600 font-bold flex items-center space-x-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <span>Cash verified — ready to finalize</span>
+              </div>
+            ) : (
+              <span className="text-slate-400 text-[11px] italic">
+                {cart.length === 0 ? 'Add items to begin sale' : 'Select payment & complete'}
+              </span>
+            )}
+          </div>
 
-          {/* Row 8: Checkout Button (h-14 py-0) */}
+          {/* Row 8: Checkout Button (h-14 py-0 with Retail Hotkey Badge) */}
           <button
             type="button"
             onClick={() => handleCheckout()}
             disabled={cart.length === 0 || isSubmitting || !isSufficientAmount}
-            className="w-full h-14 py-0 bg-sky-500 hover:bg-sky-400 active:scale-[0.99] text-white text-lg font-black rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-14 py-0 bg-sky-500 hover:bg-sky-400 active:scale-[0.99] text-white text-lg font-black rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group relative"
           >
             <CheckCircle2 className="w-5 h-5 stroke-[3]" />
             <span>{isSubmitting ? 'PROCESSING SALE...' : 'Complete Sale / Checkout'}</span>
-            <ArrowRight className="w-5 h-5 stroke-[3]" />
+            <div className="flex items-center space-x-1">
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-sky-600/60 text-[10px] font-mono font-bold text-sky-100 border border-sky-400/40">
+                Space
+              </span>
+              <ArrowRight className="w-5 h-5 stroke-[3] group-hover:translate-x-1 transition-transform" />
+            </div>
           </button>
 
         </div>
