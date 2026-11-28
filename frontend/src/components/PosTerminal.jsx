@@ -1480,10 +1480,10 @@ export default function PosTerminal({
                   <div className="text-[10px] text-pink-600 font-bold font-mono">{formatKHR(grandTotalKhr)}</div>
                 </div>
               </div>
-              {paymentMethod === 'cash' && changeDue > 0 && (
+              {paymentMethod === 'cash' && changeDueUsd > 0 && (
                 <div className="flex justify-between text-emerald-700 font-bold pt-1 border-t border-slate-200">
                   <span>Change Due:</span>
-                  <span>{formatCurrency(changeDue)}</span>
+                  <span>{formatCurrency(changeDueUsd)}</span>
                 </div>
               )}
             </div>
