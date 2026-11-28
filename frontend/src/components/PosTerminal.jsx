@@ -47,52 +47,13 @@ import confetti from 'canvas-confetti';
 
 const CATEGORIES = ['All', 'Peripherals', 'Components', 'Tools', 'Storage', 'Cables', 'Services'];
 
-// Category Color-Accents (Glanceable Hachi Signature Polish)
-const getCategoryStyle = (category) => {
-  switch (category?.toLowerCase()) {
-    case 'cables':
-      return {
-        border: 'border-t-3 border-t-sky-400 border-x border-b border-slate-200/80 hover:border-sky-400 hover:shadow-md',
-        badge: 'bg-sky-50 text-sky-700 border-sky-200',
-        bg: 'hover:bg-sky-50/20'
-      };
-    case 'components':
-      return {
-        border: 'border-t-3 border-t-indigo-400 border-x border-b border-slate-200/80 hover:border-indigo-400 hover:shadow-md',
-        badge: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-        bg: 'hover:bg-indigo-50/20'
-      };
-    case 'peripherals':
-      return {
-        border: 'border-t-3 border-t-violet-400 border-x border-b border-slate-200/80 hover:border-violet-400 hover:shadow-md',
-        badge: 'bg-violet-50 text-violet-700 border-violet-200',
-        bg: 'hover:bg-violet-50/20'
-      };
-    case 'storage':
-      return {
-        border: 'border-t-3 border-t-amber-400 border-x border-b border-slate-200/80 hover:border-amber-400 hover:shadow-md',
-        badge: 'bg-amber-50 text-amber-700 border-amber-200',
-        bg: 'hover:bg-amber-50/20'
-      };
-    case 'tools':
-      return {
-        border: 'border-t-3 border-t-emerald-400 border-x border-b border-slate-200/80 hover:border-emerald-400 hover:shadow-md',
-        badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        bg: 'hover:bg-emerald-50/20'
-      };
-    case 'services':
-      return {
-        border: 'border-t-3 border-t-rose-400 border-x border-b border-slate-200/80 hover:border-rose-400 hover:shadow-md',
-        badge: 'bg-rose-50 text-rose-700 border-rose-200',
-        bg: 'hover:bg-rose-50/20'
-      };
-    default:
-      return {
-        border: 'border-t-3 border-t-sky-400 border-x border-b border-slate-200/80 hover:border-sky-400 hover:shadow-md',
-        badge: 'bg-sky-50 text-sky-700 border-sky-200',
-        bg: 'hover:bg-sky-50/20'
-      };
-  }
+// Clean 60/30/10 Neutral Card Hover
+const getCategoryStyle = () => {
+  return {
+    border: 'border border-border hover:border-brand-500 hover:shadow-soft-hover',
+    badge: 'bg-canvas text-txt-600 border-border',
+    bg: 'hover:bg-brand-50/30'
+  };
 };
 
 // Category icon mapper for visual image placeholder
@@ -600,18 +561,18 @@ export default function PosTerminal({
   }, [cart, grandTotal, grandTotalKhr, exchangeRate, autoPrintEnabled, isSubmitting, totalPaidInUsd, numReceivedKhr, isSufficientAmount]);
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row overflow-hidden p-2.5 gap-2.5 bg-sky-50 min-h-0">
+    <div className="flex-1 flex flex-col lg:flex-row overflow-hidden p-3 gap-3 bg-canvas min-h-0">
       
-      {/* Toast Notification with Soft Hachi Theme */}
+      {/* Toast Notification */}
       {scanNotification && (
-        <div className={`fixed bottom-10 right-5 z-50 px-3.5 py-2 rounded-2xl shadow-lg border text-xs font-semibold flex items-center space-x-2 animate-bounce ${
+        <div className={`fixed bottom-10 right-5 z-50 px-4 py-2.5 rounded-btn shadow-soft border text-xs font-semibold flex items-center space-x-2 animate-bounce ${
           scanNotification.type === 'success' 
-            ? 'bg-sky-500 text-white border-sky-600 shadow-sky-500/30' 
+            ? 'bg-success-600 text-white border-success-600' 
             : scanNotification.type === 'error'
-            ? 'bg-rose-500 text-white border-rose-600 shadow-rose-500/30' 
-            : 'bg-amber-500 text-white border-amber-600 shadow-amber-500/30'
+            ? 'bg-danger-600 text-white border-danger-600' 
+            : 'bg-warning-600 text-white border-warning-600'
         }`}>
-          <Scan className="w-3.5 h-3.5" />
+          <Scan className="w-4 h-4" />
           <span>{scanNotification.message}</span>
         </div>
       )}
@@ -622,10 +583,10 @@ export default function PosTerminal({
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         
         {/* Top Action Bar: Unified Search & Barcode Omni-Bar */}
-        <div className="bg-white p-2.5 rounded-3xl border border-sky-100 shadow-xs space-y-2 shrink-0 mb-2.5">
+        <div className="bg-surface p-2.5 rounded-card border border-border shadow-soft space-y-2.5 shrink-0 mb-3">
           
           <div className="relative w-full">
-            <Search className="w-4 h-4 absolute left-3.5 top-2.5 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-txt-400" />
             <input
               ref={quickScanRef}
               name="search-catalog"
@@ -638,16 +599,19 @@ export default function PosTerminal({
                   handleScannedBarcode(searchQuery.trim());
                 }
               }}
-              placeholder="Search product name, brand, or scan barcode with USB scanner... [/]"
-              className="w-full bg-slate-50/70 border border-slate-200 focus:border-sky-400 focus:bg-white rounded-2xl pl-10 pr-28 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none transition-all shadow-2xs"
+              placeholder="Search catalog, brand, or scan barcode... [/]"
+              className="w-full h-11 bg-surface border border-border focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 rounded-btn pl-10 pr-32 text-sm text-txt-900 placeholder:text-txt-400 focus:outline-none transition-all shadow-xs"
             />
             
             <div className="absolute right-2 top-1.5 flex items-center space-x-1.5">
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[11px] font-mono text-txt-400 bg-canvas border border-border rounded">
+                /
+              </kbd>
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                  className="px-2 py-1 rounded text-xs font-semibold text-txt-400 hover:text-txt-900 hover:bg-canvas transition-colors cursor-pointer"
                 >
                   Clear
                 </button>
@@ -659,7 +623,7 @@ export default function PosTerminal({
                     handleScannedBarcode(searchQuery.trim());
                   }
                 }}
-                className="px-3 py-1 bg-sky-500 hover:bg-sky-600 active:scale-95 text-white text-xs font-bold rounded-xl transition-all flex items-center space-x-1 cursor-pointer shadow-xs"
+                className="h-8 px-3.5 bg-brand-600 hover:bg-brand-500 active:scale-95 text-white text-xs font-bold rounded-btn transition-all flex items-center space-x-1.5 cursor-pointer shadow-xs"
                 title="Scan or press Enter to add item directly"
               >
                 <Scan className="w-3.5 h-3.5" />
@@ -668,7 +632,7 @@ export default function PosTerminal({
             </div>
           </div>
 
-          {/* Category Filter Pills & Exchange Rate Widget */}
+          {/* Category Filter Chips & Exchange Rate Widget */}
           <div className="flex items-center justify-between gap-2 overflow-x-auto pb-0.5 pt-0.5 scrollbar-none">
             <div className="flex items-center space-x-1.5">
               {CATEGORIES.map(category => {
@@ -677,10 +641,10 @@ export default function PosTerminal({
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                    className={`h-10 px-3.5 rounded-pill text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer flex items-center justify-center ${
                       isSelected
-                        ? 'bg-sky-400 text-white shadow-xs font-bold'
-                        : 'bg-white text-slate-600 hover:bg-sky-50 hover:text-sky-700 border border-sky-100'
+                        ? 'bg-brand-600 text-white shadow-soft font-bold'
+                        : 'bg-surface text-txt-600 hover:bg-canvas hover:text-txt-900 border border-border'
                     }`}
                   >
                     {category}
@@ -689,9 +653,9 @@ export default function PosTerminal({
               })}
             </div>
 
-            {/* Dual Currency Exchange Rate Pill (Hachi Blush Accent) */}
-            <div className="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-600 text-[11px] font-bold flex-shrink-0">
-              <Coins className="w-3.5 h-3.5 text-rose-400" />
+            {/* Dual Currency Exchange Rate Pill */}
+            <div className="flex items-center space-x-1.5 px-3 py-1.5 rounded-pill bg-canvas border border-border text-txt-600 text-xs font-semibold flex-shrink-0">
+              <Coins className="w-3.5 h-3.5 text-txt-400" />
               {isEditingRate ? (
                 <div className="flex items-center space-x-1">
                   <span>$1 =</span>
@@ -706,7 +670,7 @@ export default function PosTerminal({
                       }
                     }}
                     onFocus={(e) => e.target.select()}
-                    className="w-16 bg-white border border-rose-300 rounded-lg px-1.5 py-0.5 text-[11px] font-mono font-bold text-slate-800 focus:outline-none focus:border-rose-500 shadow-2xs"
+                    className="w-16 bg-surface border border-border rounded-lg px-1.5 py-0.5 text-xs font-mono font-bold text-txt-900 focus:outline-none focus:border-brand-500 shadow-xs tabular-nums"
                   />
                   <span>KHR</span>
                   <button
@@ -716,19 +680,19 @@ export default function PosTerminal({
                       setTempRate(cleanRate.toString());
                       setIsEditingRate(false);
                     }}
-                    className="p-0.5 text-sky-600 hover:bg-sky-100 rounded-md cursor-pointer"
+                    className="p-1 text-brand-600 hover:bg-brand-50 rounded-md cursor-pointer"
                   >
-                    <Check className="w-3 h-3" />
+                    <Check className="w-3.5 h-3.5" />
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={() => setIsEditingRate(true)}
-                  className="hover:underline flex items-center space-x-1 cursor-pointer"
+                  className="hover:underline flex items-center space-x-1 cursor-pointer tabular-nums"
                   title="Click to edit USD/KHR exchange rate"
                 >
                   <span>$1 = {exchangeRate.toLocaleString()} ៛</span>
-                  <Edit2 className="w-3 h-3 text-rose-400 ml-0.5 opacity-70" />
+                  <Edit2 className="w-3 h-3 text-txt-400 ml-0.5 opacity-70" />
                 </button>
               )}
             </div>
@@ -736,79 +700,75 @@ export default function PosTerminal({
 
         </div>
 
-        {/* Product Cards Catalog Grid (Glanceable 2.5ft Visual Touch Targets) */}
+        {/* Product Cards Catalog Grid */}
         <div className="flex-1 overflow-y-auto pr-1 min-h-0">
           {filteredProducts.length === 0 ? (
-            <div className="h-64 flex flex-col items-center justify-center bg-white rounded-3xl border border-dashed border-sky-200 p-6 text-center">
-              <Package className="w-12 h-12 text-sky-200 mb-2" />
-              <p className="text-base font-bold text-slate-700">No hardware items found</p>
-              <p className="text-xs text-slate-400 mt-1">Try tweaking your search keywords or switch category filter.</p>
+            <div className="h-64 flex flex-col items-center justify-center bg-surface rounded-card border border-dashed border-border p-6 text-center shadow-soft">
+              <Package className="w-12 h-12 text-txt-400 mb-2" />
+              <p className="text-base font-bold text-txt-900">No hardware items found</p>
+              <p className="text-xs text-txt-400 mt-1">Try tweaking your search keywords or switch category filter.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3.5 pb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 pb-8">
               {filteredProducts.map((product) => {
                 const isOutOfStock = product.stock_qty <= 0;
                 const inCartItem = cart.find(i => i.id === product.id);
                 const inCartQty = inCartItem ? inCartItem.quantity : 0;
                 const isJustAdded = justAddedId === product.id;
-                const catStyle = getCategoryStyle(product.category);
                 const isLowStock = product.stock_qty <= (product.low_stock_threshold || 3) && product.stock_qty > 0;
+                const CategoryIcon = getProductCategoryIcon(product.category);
 
                 return (
                   <div
                     key={product.id}
                     onClick={() => !isOutOfStock && addToCart(product)}
-                    className={`group relative bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all duration-150 flex flex-col p-3.5 cursor-pointer hover:bg-sky-50/60 active:scale-95 select-none min-h-[145px] justify-between ${catStyle.border} ${catStyle.bg} ${
-                      isJustAdded
-                        ? 'ring-4 ring-sky-400 bg-sky-50 scale-[1.02] shadow-lg'
-                        : highlightedProductId === product.id
-                        ? 'ring-4 ring-sky-300 bg-sky-50 scale-[1.02] shadow-lg'
-                        : isOutOfStock
-                        ? 'opacity-50 cursor-not-allowed bg-slate-100 border-slate-300 pointer-events-none'
-                        : ''
+                    className={`group relative bg-surface rounded-card border transition-all duration-150 flex flex-col p-3.5 select-none min-h-[148px] justify-between shadow-soft ${
+                      isOutOfStock
+                        ? 'opacity-55 cursor-not-allowed bg-canvas border-border'
+                        : inCartQty > 0
+                        ? 'border-brand-600 ring-[1.5px] ring-brand-600/40 cursor-pointer hover:shadow-soft-hover active:scale-[0.98]'
+                        : 'border-border hover:border-brand-500 hover:shadow-soft-hover cursor-pointer active:scale-[0.98]'
                     }`}
                   >
                     {/* Visual 1-second overlay checkmark confirmation */}
                     {isJustAdded && (
-                      <div className="absolute inset-0 bg-sky-500/20 backdrop-blur-[0.5px] rounded-2xl flex items-center justify-center z-30 pointer-events-none animate-in fade-in zoom-in duration-100">
-                        <span className="px-4 py-2 rounded-full bg-sky-500 text-white font-black text-sm shadow-xl flex items-center space-x-2 animate-bounce">
-                          <Check className="w-5 h-5 stroke-[3]" />
-                          <span>ADDED!</span>
+                      <div className="absolute inset-0 bg-brand-500/20 backdrop-blur-[0.5px] rounded-card flex items-center justify-center z-30 pointer-events-none animate-in fade-in zoom-in duration-100">
+                        <span className="px-3.5 py-1.5 rounded-pill bg-brand-600 text-white font-black text-xs shadow-soft flex items-center space-x-1.5 animate-bounce">
+                          <Check className="w-4 h-4 stroke-[3]" />
+                          <span>ADDED</span>
                         </span>
-                      </div>
-                    )}
-
-                    {/* OUT OF STOCK Stamp Overlay */}
-                    {isOutOfStock && (
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                        <div className="border-4 border-rose-500 text-rose-600 font-black text-2xl uppercase tracking-widest px-6 py-1 rounded-2xl bg-white/95 shadow-xl -rotate-12">
-                          OUT
-                        </div>
                       </div>
                     )}
 
                     {/* Top Meta: Brand Pill & In-Cart Count */}
                     <div className="flex items-center justify-between gap-1 mb-1.5">
                       <div className="flex items-center space-x-1.5 overflow-hidden">
-                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-bold text-[10px] uppercase tracking-wider shrink-0 border border-slate-200/60">
+                        <span className="px-2 py-0.5 rounded-md bg-canvas text-txt-600 font-semibold text-[10px] uppercase tracking-wider shrink-0 border border-border">
                           {product.brand || product.category}
                         </span>
                         {isLowStock && (
-                          <span className="px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 font-bold text-[9px] flex items-center space-x-0.5 shrink-0 border border-amber-200">
-                            <span>⚠️ {product.stock_qty} left</span>
+                          <span className="px-2 py-0.5 rounded-md bg-warning-50 text-warning-600 font-semibold text-[10px] flex items-center space-x-1 shrink-0 border border-warning-600/20">
+                            <Box className="w-3 h-3" />
+                            <span>{product.stock_qty} in stock</span>
+                          </span>
+                        )}
+                        {!isLowStock && !isOutOfStock && (
+                          <span className="px-1.5 py-0.5 rounded-md text-txt-400 text-[10px] flex items-center space-x-1 shrink-0">
+                            <Box className="w-3 h-3 text-txt-400" />
+                            <span>{product.stock_qty}</span>
                           </span>
                         )}
                       </div>
                       {inCartQty > 0 && (
-                        <span className="shrink-0 px-2 py-0.5 rounded-full bg-sky-500 text-white font-black text-xs font-mono shadow-xs">
+                        <span className="shrink-0 px-2 py-0.5 rounded-pill bg-brand-600 text-white font-bold text-xs font-mono shadow-xs tabular-nums">
                           ×{inCartQty}
                         </span>
                       )}
                     </div>
 
-                    {/* Center: Thumbnail + Title */}
+                    {/* Center: Thumbnail + Title with Tooltip */}
                     <div className="flex items-start space-x-2.5 my-1">
-                      <div className="w-11 h-11 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 shrink-0 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                      <div className="w-11 h-11 rounded-btn overflow-hidden bg-canvas border border-border shrink-0 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
                         {product.image ? (
                           <img 
                             src={product.image} 
@@ -817,22 +777,35 @@ export default function PosTerminal({
                             onError={(e) => { e.target.style.display = 'none'; }}
                           />
                         ) : (
-                          <Package className="w-5 h-5 text-slate-400" />
+                          <div className="w-full h-full bg-brand-50 flex items-center justify-center">
+                            <CategoryIcon className="w-5 h-5 text-brand-600" />
+                          </div>
                         )}
                       </div>
-                      <h4 className="text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-sky-600 transition-colors">
+                      <h4 
+                        className="text-sm font-semibold text-txt-900 line-clamp-2 leading-snug group-hover:text-brand-600 transition-colors"
+                        title={product.name}
+                      >
                         {product.name}
                       </h4>
                     </div>
 
-                    {/* Bottom: Price + KHR Dual-Currency Pill */}
-                    <div className="mt-auto pt-2 flex items-baseline justify-between border-t border-slate-100">
-                      <span className="text-sky-600 text-lg font-black font-mono">
-                        {formatCurrency(product.selling_price)}
-                      </span>
-                      <span className="px-1.5 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-rose-600 text-[10px] font-bold font-mono">
-                        {formatKHR(parseFloat(product.selling_price) * exchangeRate)}
-                      </span>
+                    {/* Bottom: Price + KHR Dual-Currency Pill OR Clean Out of Stock badge */}
+                    <div className="mt-auto pt-2 flex items-baseline justify-between border-t border-border">
+                      {isOutOfStock ? (
+                        <span className="px-2.5 py-0.5 rounded-btn bg-danger-50 border border-danger-600 text-danger-600 font-bold text-xs">
+                          Out of stock
+                        </span>
+                      ) : (
+                        <>
+                          <span className="text-brand-600 text-base font-bold font-mono tabular-nums">
+                            {formatCurrency(product.selling_price)}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-pill bg-canvas border border-border text-txt-600 text-[11px] font-mono tabular-nums">
+                            ៛ {Math.round(parseFloat(product.selling_price) * exchangeRate).toLocaleString()}
+                          </span>
+                        </>
+                      )}
                     </div>
 
                   </div>
