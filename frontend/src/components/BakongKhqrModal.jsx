@@ -167,28 +167,28 @@ export default function BakongKhqrModal({
           </div>
 
           {/* Amount Display */}
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2 w-full flex items-center justify-between">
+          <div className="bg-rose-50/60 border border-rose-200/80 rounded-2xl px-4 py-2 w-full flex items-center justify-between">
             <div>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block text-left">
+              <span className="text-[10px] font-bold text-rose-600 uppercase tracking-wider block text-left">
                 Amount to Pay
               </span>
               <div className="flex items-center space-x-2">
                 <span className="text-2xl font-black text-slate-900 leading-none">
                   {currency === 'USD' ? formatCurrency(totalUsd) : formatKHR(totalKhr)}
                 </span>
-                <span className="text-xs font-bold text-slate-500 font-mono">
+                <span className="text-xs font-bold text-rose-500 font-mono">
                   ({currency === 'USD' ? formatKHR(totalKhr) : formatCurrency(totalUsd)})
                 </span>
               </div>
             </div>
 
             {/* Currency Selector */}
-            <div className="flex bg-white rounded-xl p-0.5 border border-slate-200 shadow-2xs text-xs">
+            <div className="flex bg-white rounded-xl p-0.5 border border-rose-200 shadow-2xs text-xs">
               <button
                 type="button"
                 onClick={() => setCurrency('USD')}
                 className={`px-2.5 py-1 rounded-lg font-black transition-colors cursor-pointer ${
-                  currency === 'USD' ? 'bg-sky-600 text-white shadow-2xs' : 'text-slate-600'
+                  currency === 'USD' ? 'bg-sky-500 text-white shadow-2xs' : 'text-slate-600 hover:text-sky-600'
                 }`}
               >
                 USD ($)
@@ -197,7 +197,7 @@ export default function BakongKhqrModal({
                 type="button"
                 onClick={() => setCurrency('KHR')}
                 className={`px-2.5 py-1 rounded-lg font-black transition-colors cursor-pointer ${
-                  currency === 'KHR' ? 'bg-sky-600 text-white shadow-2xs' : 'text-slate-600'
+                  currency === 'KHR' ? 'bg-rose-500 text-white shadow-2xs' : 'text-slate-600 hover:text-rose-600'
                 }`}
               >
                 KHR (៛)

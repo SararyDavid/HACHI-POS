@@ -33,7 +33,7 @@ export default function Navbar({
             <span className="font-extrabold text-base tracking-tight text-slate-800">
               HACHI<span className="text-sky-500">TECH</span>
             </span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-700 font-bold border border-slate-200">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 font-bold border border-rose-200/80 shadow-2xs">
               POS v2.4
             </span>
           </div>

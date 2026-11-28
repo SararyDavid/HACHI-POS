@@ -47,13 +47,52 @@ import confetti from 'canvas-confetti';
 
 const CATEGORIES = ['All', 'Peripherals', 'Components', 'Tools', 'Storage', 'Cables', 'Services'];
 
-// Crisp Minimalist Enterprise Border & Hover (Clean 60-30-10 palette)
+// Category Color-Accents (Glanceable Hachi Signature Polish)
 const getCategoryStyle = (category) => {
-  return {
-    border: 'border border-slate-200/90 hover:border-blue-500 hover:shadow-md',
-    badge: 'bg-slate-100 text-slate-700 border-slate-200',
-    bg: 'hover:bg-slate-50/60'
-  };
+  switch (category?.toLowerCase()) {
+    case 'cables':
+      return {
+        border: 'border-t-3 border-t-sky-400 border-x border-b border-slate-200/80 hover:border-sky-400 hover:shadow-md',
+        badge: 'bg-sky-50 text-sky-700 border-sky-200',
+        bg: 'hover:bg-sky-50/20'
+      };
+    case 'components':
+      return {
+        border: 'border-t-3 border-t-indigo-400 border-x border-b border-slate-200/80 hover:border-indigo-400 hover:shadow-md',
+        badge: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        bg: 'hover:bg-indigo-50/20'
+      };
+    case 'peripherals':
+      return {
+        border: 'border-t-3 border-t-violet-400 border-x border-b border-slate-200/80 hover:border-violet-400 hover:shadow-md',
+        badge: 'bg-violet-50 text-violet-700 border-violet-200',
+        bg: 'hover:bg-violet-50/20'
+      };
+    case 'storage':
+      return {
+        border: 'border-t-3 border-t-amber-400 border-x border-b border-slate-200/80 hover:border-amber-400 hover:shadow-md',
+        badge: 'bg-amber-50 text-amber-700 border-amber-200',
+        bg: 'hover:bg-amber-50/20'
+      };
+    case 'tools':
+      return {
+        border: 'border-t-3 border-t-emerald-400 border-x border-b border-slate-200/80 hover:border-emerald-400 hover:shadow-md',
+        badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        bg: 'hover:bg-emerald-50/20'
+      };
+    case 'services':
+      return {
+        border: 'border-t-3 border-t-rose-400 border-x border-b border-slate-200/80 hover:border-rose-400 hover:shadow-md',
+        badge: 'bg-rose-50 text-rose-700 border-rose-200',
+        bg: 'hover:bg-rose-50/20'
+      };
+    default:
+      return {
+        border: 'border-t-3 border-t-sky-400 border-x border-b border-slate-200/80 hover:border-sky-400 hover:shadow-md',
+        badge: 'bg-sky-50 text-sky-700 border-sky-200',
+        bg: 'hover:bg-sky-50/20'
+      };
+  }
 };
 
 // Category icon mapper for visual image placeholder
@@ -650,9 +689,9 @@ export default function PosTerminal({
               })}
             </div>
 
-            {/* Dual Currency Exchange Rate Pill */}
-            <div className="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-bold flex-shrink-0">
-              <Coins className="w-3.5 h-3.5 text-slate-500" />
+            {/* Dual Currency Exchange Rate Pill (Hachi Blush Accent) */}
+            <div className="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-600 text-[11px] font-bold flex-shrink-0">
+              <Coins className="w-3.5 h-3.5 text-rose-400" />
               {isEditingRate ? (
                 <div className="flex items-center space-x-1">
                   <span>$1 =</span>
@@ -667,7 +706,7 @@ export default function PosTerminal({
                       }
                     }}
                     onFocus={(e) => e.target.select()}
-                    className="w-16 bg-white border border-slate-300 rounded-lg px-1.5 py-0.5 text-[11px] font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs"
+                    className="w-16 bg-white border border-rose-300 rounded-lg px-1.5 py-0.5 text-[11px] font-mono font-bold text-slate-800 focus:outline-none focus:border-rose-500 shadow-2xs"
                   />
                   <span>KHR</span>
                   <button
@@ -689,7 +728,7 @@ export default function PosTerminal({
                   title="Click to edit USD/KHR exchange rate"
                 >
                   <span>$1 = {exchangeRate.toLocaleString()} ៛</span>
-                  <Edit2 className="w-3 h-3 text-slate-400 ml-0.5 opacity-70" />
+                  <Edit2 className="w-3 h-3 text-rose-400 ml-0.5 opacity-70" />
                 </button>
               )}
             </div>
@@ -791,7 +830,7 @@ export default function PosTerminal({
                       <span className="text-sky-600 text-lg font-black font-mono">
                         {formatCurrency(product.selling_price)}
                       </span>
-                      <span className="px-1.5 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-bold font-mono">
+                      <span className="px-1.5 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-rose-600 text-[10px] font-bold font-mono">
                         {formatKHR(parseFloat(product.selling_price) * exchangeRate)}
                       </span>
                     </div>
@@ -1017,7 +1056,7 @@ export default function PosTerminal({
                 <span className="text-3xl font-black text-sky-600 font-mono tracking-tight leading-none">
                   {formatCurrency(grandTotal)}
                 </span>
-                <span className="text-xs font-bold text-slate-500 font-mono">
+                <span className="text-xs font-bold text-rose-500 font-mono">
                   ({formatKHR(grandTotalKhr)})
                 </span>
               </div>
@@ -1114,8 +1153,8 @@ export default function PosTerminal({
                     }}
                     className={`h-8 rounded-xl border font-mono text-[11px] font-black transition-all cursor-pointer active:scale-95 shadow-2xs flex items-center justify-center ${
                       parseFloat(amountReceivedKhr) === bill.val && !amountReceived
-                        ? 'bg-slate-800 text-white border-slate-900 ring-1 ring-slate-400'
-                        : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
+                        ? 'bg-rose-500 text-white border-rose-600 ring-1 ring-rose-300'
+                        : 'bg-white hover:bg-rose-50 text-rose-700 border-rose-200'
                     }`}
                   >
                     {bill.label}
@@ -1127,7 +1166,7 @@ export default function PosTerminal({
                     setAmountReceived('');
                     setAmountReceivedKhr(Math.round(grandTotalKhr).toString());
                   }}
-                  className="h-8 rounded-xl border bg-slate-800 hover:bg-slate-900 text-white font-mono text-[11px] font-black transition-all cursor-pointer active:scale-95 shadow-2xs flex items-center justify-center"
+                  className="h-8 rounded-xl border bg-rose-500 hover:bg-rose-600 text-white font-mono text-[11px] font-black transition-all cursor-pointer active:scale-95 shadow-2xs flex items-center justify-center"
                   title="Exact KHR"
                 >
                   Exact ៛
@@ -1166,9 +1205,9 @@ export default function PosTerminal({
                   )}
                 </div>
 
-                {/* KHR Manual */}
-                <div className="h-10 bg-white border border-slate-200 rounded-xl px-2.5 flex items-center focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-200 shadow-2xs">
-                  <span className="text-slate-500 font-mono text-sm font-bold mr-1.5">៛</span>
+                {/* KHR Manual (Hachi Blush Rose Accent) */}
+                <div className="h-10 bg-white border border-rose-200 rounded-xl px-2.5 flex items-center focus-within:border-rose-500 focus-within:ring-1 focus-within:ring-rose-200 shadow-2xs">
+                  <span className="text-rose-500 font-mono text-sm font-bold mr-1.5">៛</span>
                   <input
                     id="khr-cash-input"
                     type="text"
@@ -1182,13 +1221,13 @@ export default function PosTerminal({
                     }}
                     onFocus={(e) => e.target.select()}
                     placeholder="Paid (៛ KHR)"
-                    className="w-full bg-transparent font-mono text-sm font-black text-slate-800 focus:outline-none placeholder:text-slate-400 placeholder:font-sans placeholder:text-xs"
+                    className="w-full bg-transparent font-mono text-sm font-black text-rose-600 focus:outline-none placeholder:text-rose-300 placeholder:font-sans placeholder:text-xs"
                   />
                   {amountReceivedKhr !== '' && (
                     <button
                       type="button"
                       onClick={() => setAmountReceivedKhr('')}
-                      className="text-slate-400 hover:text-slate-700 text-xs font-bold px-1 cursor-pointer"
+                      className="text-rose-400 hover:text-rose-700 text-xs font-bold px-1 cursor-pointer"
                       title="Clear KHR"
                     >
                       ×
@@ -1204,7 +1243,7 @@ export default function PosTerminal({
                   <span className="font-mono font-black text-base text-sky-600 leading-none">
                     {formatCurrency(changeDueUsd)}
                   </span>
-                  <span className="font-mono font-bold text-[11px] text-slate-500">
+                  <span className="font-mono font-bold text-[11px] text-rose-500">
                     ({formatKHR(changeDueKhr)})
                   </span>
                 </div>
@@ -1424,7 +1463,7 @@ export default function PosTerminal({
                 <span className="font-bold text-slate-700">Total to Pay:</span>
                 <div className="text-right">
                   <div className="font-black text-slate-900 font-mono text-sm">{formatCurrency(grandTotal)}</div>
-                  <div className="text-[10px] text-slate-500 font-bold font-mono">{formatKHR(grandTotalKhr)}</div>
+                  <div className="text-[10px] text-rose-500 font-bold font-mono">{formatKHR(grandTotalKhr)}</div>
                 </div>
               </div>
               {paymentMethod === 'cash' && changeDueUsd > 0 && (
