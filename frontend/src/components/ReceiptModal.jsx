@@ -72,9 +72,8 @@ export default function ReceiptModal({
           {/* Modal Body */}
           <div className="flex-1 overflow-y-auto p-6 bg-slate-100 flex justify-center items-start">
             
-            {activeTab === 'receipt' ? (
-              /* 80mm Thermal Paper Simulation (width 300px) */
-              <div className="w-[300px] bg-white rounded-lg shadow-md border border-slate-300 p-4 font-mono text-[11px] leading-tight text-black selection:bg-none">
+            {/* 80mm Thermal Paper Simulation (width 300px) */}
+            <div className="w-[300px] bg-white rounded-lg shadow-md border border-slate-300 p-4 font-mono text-[11px] leading-tight text-black selection:bg-none">
                 
                 {/* Store Header */}
                 <div className="text-center pb-2 border-b border-dashed border-slate-400">
