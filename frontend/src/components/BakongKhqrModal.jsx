@@ -27,6 +27,8 @@ export default function BakongKhqrModal({
   const [serverKhqr, setServerKhqr] = useState('');
   const [activeMd5, setActiveMd5] = useState(null);
   const [isCheckingBakong, setIsCheckingBakong] = useState(false);
+  const [bakongQuotaExceeded, setBakongQuotaExceeded] = useState(false);
+  const [statusNotice, setStatusNotice] = useState('');
 
   const activeAmount = currency === 'USD' ? totalUsd : totalKhr;
 
@@ -75,6 +77,10 @@ export default function BakongKhqrModal({
                   clearInterval(pollTimer);
                   if (onPaymentSuccess) onPaymentSuccess(checkRes.data);
                   onClose();
+                } else if (checkRes?.bakong?.responseMessage?.includes('Daily request limit')) {
+                  // NBC 100/day developer quota reached
+                  clearInterval(pollTimer);
+                  setBakongQuotaExceeded(true);
                 }
               } catch (err) {}
             }, 6000);
@@ -237,6 +243,22 @@ export default function BakongKhqrModal({
             Scan with <strong className="text-slate-600">ABA Mobile</strong>, <strong className="text-slate-600">Bakong</strong>, or any Cambodian Mobile Banking App.
           </p>
 
+          {/* Quota or Status Notification Banner (No blocking browser alert) */}
+          {(bakongQuotaExceeded || statusNotice) && (
+            <div className="w-full p-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[11px] leading-snug flex items-start space-x-2">
+              <span className="text-amber-500 font-bold shrink-0">ℹ️</span>
+              <div className="flex-1">
+                {bakongQuotaExceeded ? (
+                  <span>
+                    NBC Bakong test quota reached for today (100 checks). Customer transfer can be confirmed directly using <strong>✓ Confirm Payment Received</strong> once verified on your ABA app.
+                  </span>
+                ) : (
+                  <span>{statusNotice}</span>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Primary Cashier Action: Manual Instant Confirm */}
           <button
             type="button"
@@ -251,31 +273,39 @@ export default function BakongKhqrModal({
           </button>
 
           {/* Re-Check Bakong Switch Button */}
-          <button
-            type="button"
-            onClick={async () => {
-              if (!activeMd5 || isCheckingBakong) return;
-              setIsCheckingBakong(true);
-              try {
-                const checkRes = await checkKhqrStatus(activeMd5);
-                if (checkRes?.confirmed) {
-                  if (onPaymentSuccess) onPaymentSuccess(checkRes.data);
-                  onClose();
-                } else {
-                  alert(checkRes?.bakong?.responseMessage || 'Bakong: Transaction not found yet on NBC switch. If customer confirmed transfer, tap Confirm Payment.');
+          {!bakongQuotaExceeded && (
+            <button
+              type="button"
+              onClick={async () => {
+                if (!activeMd5 || isCheckingBakong) return;
+                setIsCheckingBakong(true);
+                setStatusNotice('');
+                try {
+                  const checkRes = await checkKhqrStatus(activeMd5);
+                  if (checkRes?.confirmed) {
+                    if (onPaymentSuccess) onPaymentSuccess(checkRes.data);
+                    onClose();
+                  } else {
+                    const msg = checkRes?.bakong?.responseMessage || '';
+                    if (msg.includes('Daily request limit')) {
+                      setBakongQuotaExceeded(true);
+                    } else {
+                      setStatusNotice(msg || 'Transaction pending on NBC Bakong network.');
+                    }
+                  }
+                } catch (err) {
+                  setStatusNotice('Bakong connection timeout. Tap Confirm Payment once verified.');
+                } finally {
+                  setIsCheckingBakong(false);
                 }
-              } catch (err) {
-                alert('Bakong check failed: ' + err.message);
-              } finally {
-                setIsCheckingBakong(false);
-              }
-            }}
-            disabled={isCheckingBakong}
-            className="w-full py-1.5 px-3 bg-red-50 hover:bg-red-100 active:scale-[0.99] text-[#E21A1A] font-bold text-xs rounded-xl border border-red-200 flex items-center justify-center space-x-1.5 transition-all cursor-pointer shadow-2xs"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isCheckingBakong ? 'animate-spin' : ''}`} />
-            <span>{isCheckingBakong ? 'Querying NBC Bakong...' : 'Re-Check Bakong API Status'}</span>
-          </button>
+              }}
+              disabled={isCheckingBakong}
+              className="w-full py-1.5 px-3 bg-red-50 hover:bg-red-100 active:scale-[0.99] text-[#E21A1A] font-bold text-xs rounded-xl border border-red-200 flex items-center justify-center space-x-1.5 transition-all cursor-pointer shadow-2xs"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isCheckingBakong ? 'animate-spin' : ''}`} />
+              <span>{isCheckingBakong ? 'Querying NBC Bakong...' : 'Re-Check Bakong API Status'}</span>
+            </button>
+          )}
 
           {/* Action Footer: Copy QR String */}
           <div className="w-full pt-1 border-t border-slate-100 flex justify-end">
