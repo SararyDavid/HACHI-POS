@@ -1,35 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { 
   Printer, 
   X, 
-  CheckCircle2, 
-  Terminal, 
-  Copy, 
-  Check, 
-  Send, 
-  QrCode, 
-  FileText,
-  Download
+  CheckCircle2
 } from 'lucide-react';
 import { formatCurrency, formatKHR, formatDateTime } from '../utils/formatters';
-import { triggerEscPosPrint } from '../api';
 import { MY_ABA_STATIC_QR, generateDynamicKhqr } from '../utils/khqr';
 
 export default function ReceiptModal({ 
   sale, 
-  escposData, 
   isOpen, 
   onClose,
   autoPrint = false 
 }) {
-  const [activeTab, setActiveTab] = useState('receipt'); // 'receipt' | 'escpos'
-  const [copied, setCopied] = useState(false);
-  const [isSendingToPrinter, setIsSendingToPrinter] = useState(false);
-  const [printerResponse, setPrinterResponse] = useState(null);
-  const [printerIp, setPrinterIp] = useState('192.168.1.200');
-  const [printerPort, setPrinterPort] = useState(9100);
-
   useEffect(() => {
     if (isOpen && autoPrint) {
       const timer = setTimeout(() => {
@@ -43,33 +27,6 @@ export default function ReceiptModal({
 
   const handlePrint = () => {
     window.print();
-  };
-
-  const handleCopyHex = () => {
-    if (escposData?.hex) {
-      navigator.clipboard.writeText(escposData.hex);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  const handleSendToEscPosPrinter = async () => {
-    setIsSendingToPrinter(true);
-    setPrinterResponse(null);
-    try {
-      const result = await triggerEscPosPrint(sale, { printerIp, printerPort });
-      setPrinterResponse({
-        success: true,
-        message: result.hardwareStatus || 'ESC/POS commands sent successfully'
-      });
-    } catch (err) {
-      setPrinterResponse({
-        success: false,
-        message: err.response?.data?.message || err.message || 'Printer communication failed'
-      });
-    } finally {
-      setIsSendingToPrinter(false);
-    }
   };
 
   const storeInfo = {
@@ -100,25 +57,12 @@ export default function ReceiptModal({
             </div>
 
             <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setActiveTab('receipt')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                  activeTab === 'receipt' ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                }`}
-              >
-                80mm Layout
-              </button>
-              <button
-                onClick={() => setActiveTab('escpos')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                  activeTab === 'escpos' ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                }`}
-              >
-                ESC/POS Raw
-              </button>
+              <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-sky-100 text-sky-800 border border-sky-200">
+                80mm Thermal Receipt
+              </span>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors ml-2"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors ml-2 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -141,7 +85,7 @@ export default function ReceiptModal({
                 </div>
 
                 {/* Metadata */}
-                <div className="py-2 border-b border-dashed border-slate-400 space-y-0.5 text-[10px]">
+                <div className="py-2 border-b border-dashed border-slate-400 space-y-1 text-[10px]">
                   <div className="flex justify-between font-bold">
                     <span>INVOICE:</span>
                     <span>{sale.invoice_no}</span>
@@ -150,9 +94,9 @@ export default function ReceiptModal({
                     <span>Date:</span>
                     <span>{formatDateTime(sale.created_at)}</span>
                   </div>
-                  <div className="flex justify-between text-slate-700">
-                    <span>Cashier:</span>
-                    <span>{sale.cashier_name || 'Admin'}</span>
+                  <div className="flex justify-between items-center text-slate-800 font-bold bg-sky-50 px-1.5 py-0.5 rounded border border-sky-100">
+                    <span>Served By (Cashier):</span>
+                    <span className="text-sky-700 font-black">{sale.cashier_name || 'Admin'}</span>
                   </div>
                 </div>
 
@@ -319,81 +263,6 @@ export default function ReceiptModal({
                 </div>
 
               </div>
-            ) : (
-              /* ESC/POS Raw Command Inspection & Test Panel */
-              <div className="w-full bg-slate-900 text-slate-100 rounded-xl p-4 font-mono text-xs space-y-4">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-700">
-                  <div className="flex items-center space-x-2">
-                    <Terminal className="w-4 h-4 text-emerald-400" />
-                    <span className="font-bold text-slate-200">ESC/POS Thermal Protocol Stream</span>
-                  </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">
-                    {escposData?.byteLength || 320} Bytes
-                  </span>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-semibold text-slate-400 block mb-1">
-                    Binary Hex Payload (Ready for /dev/usb/lp0 or Raw Port 9100)
-                  </label>
-                  <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 max-h-36 overflow-y-auto break-all font-mono text-[10px] text-emerald-400">
-                    {escposData?.hex || '1b401b61011d2111484143484920544543480a1d2100...'}
-                  </div>
-                  <button
-                    onClick={handleCopyHex}
-                    className="mt-2 flex items-center space-x-1.5 px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-xs transition-colors"
-                  >
-                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copied ? 'Copied Hex' : 'Copy Hex Stream'}</span>
-                  </button>
-                </div>
-
-                {/* Direct ESC/POS Network Hardware Send */}
-                <div className="pt-2 border-t border-slate-800 space-y-2">
-                  <span className="text-xs font-bold text-slate-300 block">Send to ESC/POS Thermal Printer</span>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="col-span-2">
-                      <label className="text-[10px] text-slate-400">Printer IP Address</label>
-                      <input
-                        type="text"
-                        value={printerIp}
-                        onChange={(e) => setPrinterIp(e.target.value)}
-                        placeholder="192.168.1.200"
-                        className="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-sky-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] text-slate-400">Port (Default 9100)</label>
-                      <input
-                        type="number"
-                        value={printerPort}
-                        onChange={(e) => setPrinterPort(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-sky-500"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleSendToEscPosPrinter}
-                    disabled={isSendingToPrinter}
-                    className="w-full py-1.5 bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white rounded font-medium text-xs flex items-center justify-center space-x-1.5 transition-colors"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>{isSendingToPrinter ? 'Transmitting ESC/POS...' : 'Test Send via Backend Socket'}</span>
-                  </button>
-
-                  {printerResponse && (
-                    <div className={`p-2 rounded text-[11px] ${
-                      printerResponse.success ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800' : 'bg-red-950/80 text-red-300 border border-red-800'
-                    }`}>
-                      {printerResponse.message}
-                    </div>
-                  )}
-                </div>
-
-              </div>
-            )}
-
           </div>
 
           {/* Footer Actions */}
@@ -445,7 +314,7 @@ export default function ReceiptModal({
             <span>Date:</span>
             <span>{formatDateTime(sale.created_at)}</span>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
             <span>Cashier:</span>
             <span>{sale.cashier_name || 'Admin'}</span>
           </div>
